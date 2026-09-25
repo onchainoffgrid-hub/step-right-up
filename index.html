@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Step Right Up — Florida scholarship filing confidence tool from Critters on Call / Sheehan Homestead.">
+<title>Step Right Up · Critters on Call</title>
+<style>
+  :root {
+    --pine: #2c4a38;
+    --pine-dark: #1e3428;
+    --pine-light: #3a5f4a;
+    --gold: #c4a35a;
+    --gold-soft: #d4b86e;
+    --cream: #f5f0e6;
+    --cream-dim: rgba(245, 240, 230, 0.72);
+    --cream-faint: rgba(245, 240, 230, 0.18);
+    --danger: #c47a6a;
+    --ok: #7aab88;
+    --radius: 14px;
+    --tap: 48px;
+    --shadow: 0 8px 28px rgba(0,0,0,0.28);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    min-height: 100%;
+    background: var(--pine);
+    color: var(--cream);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.45;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body { position: relative; overflow-x: hidden; }
+  .watermark {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(2.2rem, 10vw, 4.5rem);
+    font-weight: 700; letter-spacing: 0.06em;
+    color: rgba(245, 240, 230, 0.045);
+    transform: rotate(-18deg);
+    user-select: none; white-space: nowrap;
+  }
+  .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 20px 16px 40px; min-height: 100vh; }
+  h1, h2, h3 { margin: 0 0 0.5em; font-weight: 700; letter-spacing: 0.02em; }
+  h1 { font-size: 1.75rem; color: var(--gold); }
+  h2 { font-size: 1.35rem; color: var(--gold); }
+  h3 { font-size: 1.1rem; color: var(--cream); }
+  p { margin: 0 0 0.85em; }
+  .brand-line { font-size: 0.8rem; color: var(--cream-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .sub { color: var(--cream-dim); font-size: 0.95rem; }
+  .screen { display: none; animation: fadeIn 0.28s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: var(--tap); padding: 12px 20px;
+    border: 2px solid var(--gold); border-radius: var(--radius);
+    background: var(--gold); color: var(--pine-dark);
+    font-size: 1rem; font-weight: 700; font-family: inherit;
+    cursor: pointer; text-decoration: none;
+    transition: transform 0.12s, background 0.15s, border-color 0.15s;
+    width: 100%;
+    -webkit-user-select: none; user-select: none;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-outline {
+    background: transparent; color: var(--cream); border-color: var(--gold);
+  }
+  .btn-outline:hover, .btn-outline:focus-visible { background: var(--cream-faint); }
+  .btn-ghost {
+    background: transparent; border-color: transparent; color: var(--cream-dim);
+    min-height: 44px; width: auto; padding: 8px 12px;
+  }
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .btn-row .btn { flex: 1; min-width: 120px; }
+
+  .module-card {
+    display: block; width: 100%; text-align: left;
+    background: var(--pine-light); border: 2px solid var(--gold);
+    border-radius: var(--radius); padding: 20px 18px; margin: 14px 0;
+    color: var(--cream); cursor: pointer; box-shadow: var(--shadow);
+    font-family: inherit; font-size: inherit;
+  }
+  .module-card:active { transform: scale(0.98); }
+  .module-card strong { display: block; color: var(--gold); font-size: 1.2rem; margin-bottom: 4px; }
+  .module-card span { color: var(--cream-dim); font-size: 0.92rem; }
+
+  .filer-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 20px;
+  }
+  .filer-opt {
+    min-height: var(--tap); padding: 14px 10px;
+    border: 2px solid var(--cream-faint); border-radius: var(--radius);
+    background: var(--pine-dark); color: var(--cream);
+    font-size: 1rem; font-weight: 600; font-family: inherit; cursor: pointer;
+  }
+  .filer-opt.selected {
+    border-color: var(--gold); background: var(--pine-light);
+    box-shadow: inset 0 0 0 1px var(--gold);
+  }
+
+  .card {
+    background: var(--pine-dark); border: 1px solid var(--cream-faint);
+    border-radius: var(--radius); padding: 20px 18px; margin: 12px 0;
+    box-shadow: var(--shadow);
+  }
+  .progress {
+    display: flex; gap: 5px; margin: 12px 0 18px; flex-wrap: wrap;
+  }
+  .progress span {
+    width: 28px; height: 6px; border-radius: 3px;
+    background: var(--cream-faint);
+  }
+  .progress span.on { background: var(--gold); }
+  .progress span.done { background: var(--ok); }
+
+  .quiz-opt {
+    display: block; width: 100%; text-align: left;
+    min-height: var(--tap); padding: 14px 16px; margin: 8px 0;
+    border: 2px solid var(--cream-faint); border-radius: var(--radius);
+    background: var(--pine-light); color: var(--cream);
+    font-size: 0.98rem; font-family: inherit; cursor: pointer;
+  }
+  .quiz-opt:disabled { opacity: 0.85; cursor: default; }
+  .quiz-opt.correct { border-color: var(--ok); background: rgba(122,171,136,0.25); }
+  .quiz-opt.wrong { border-color: var(--danger); background: rgba(196,122,106,0.2); }
+  .why {
+    margin-top: 12px; padding: 12px 14px;
+    background: rgba(196,163,90,0.15); border-left: 3px solid var(--gold);
+    border-radius: 0 10px 10px 0; font-size: 0.92rem; color: var(--cream);
+  }
+  .score-banner {
+    text-align: center; padding: 18px; margin: 16px 0;
+    border-radius: var(--radius); border: 2px solid var(--gold);
+  }
+  .score-banner.pass { background: rgba(122,171,136,0.2); }
+  .score-banner.fail { background: rgba(196,122,106,0.18); border-color: var(--danger); }
+
+  .checklist { list-style: none; padding: 0; margin: 12px 0; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--cream-faint);
+    font-size: 0.95rem;
+  }
+  .checklist li::before {
+    content: "✓"; color: var(--gold); font-weight: 700; flex-shrink: 0;
+  }
+  .disclaimer {
+    margin-top: 20px; padding: 14px;
+    font-size: 0.8rem; color: var(--cream-dim);
+    border: 1px dashed var(--cream-faint); border-radius: 10px;
+  }
+  #badgeCanvas {
+    display: block; width: 100%; max-width: 320px; margin: 16px auto;
+    border-radius: 12px; background: var(--pine-dark);
+    touch-action: manipulation;
+  }
+  #watchCanvas {
+    display: block; width: 100%; height: min(70vh, 560px);
+    border-radius: var(--radius); background: var(--pine);
+    border: 2px solid var(--gold); touch-action: none;
+    box-shadow: var(--shadow);
+  }
+  .watch-hud {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 10px 0; font-size: 0.95rem; color: var(--cream-dim);
+  }
+  .watch-hud strong { color: var(--gold); font-size: 1.1rem; }
+  .toast {
+    position: absolute; pointer-events: none;
+    color: var(--gold); font-weight: 700; font-size: 0.95rem;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    animation: toastUp 0.9s ease forwards; white-space: nowrap;
+  }
+  @keyframes toastUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-36px); }
+  }
+  .watch-wrap { position: relative; }
+  .hidden { display: none !important; }
+  .center { text-align: center; }
+  .mt { margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="watermark" aria-hidden="true">Critters on Call</div>
+<div class="app">
+
+  <!-- HOME -->
+  <section id="home" class="screen active" aria-label="Home">
+    <p class="brand-line">Critters on Call · Sheehan Homestead</p>
+    <h1>Step Right Up</h1>
+    <p class="sub">Learn the Florida scholarship doors, check your confidence, then keep the watch. Built for families filing with clarity.</p>
+    <button type="button" class="module-card" id="goStep">
+      <strong>Step Right Up</strong>
+      <span>Short lessons + quiz · filing checklist · official apply link</span>
+    </button>
+    <button type="button" class="module-card" id="goWatch">
+      <strong>The Watch</strong>
+      <span>Tap game · crush the to-dos before they hit the floor</span>
+    </button>
+    <p class="disclaimer">A confidence tool only — not the application and not legal advice. The official Step Up for Students site is the source of truth.</p>
+  </section>
+
+  <!-- FILER PICK -->
+  <section id="filer" class="screen" aria-label="Who is filing">
+    <button type="button" class="btn-ghost" data-home>← Home</button>
+    <h2>Who is filing?</h2>
+    <p class="sub">We'll cheer you on by name. Mom is selected by default.</p>
+    <div class="filer-grid" role="group" aria-label="Filer">
+      <button type="button" class="filer-opt selected" data-filer="Mom">Mom</button>
+      <button type="button" class="filer-opt" data-filer="Dad">Dad</button>
+      <button type="button" class="filer-opt" data-filer="Grandma">Grandma</button>
+      <button type="button" class="filer-opt" data-filer="Auntie">Auntie</button>
+    </div>
+    <p id="filerCheer" class="center" style="color:var(--gold);font-weight:600;">You've got this, Mom.</p>
+    <button type="button" class="btn mt" id="startLessons">Start lessons</button>
+  </section>
+
+  <!-- LESSONS -->
+  <section id="lessons" class="screen" aria-label="Lessons">
+    <button type="button" class="btn-ghost" data-home>← Home</button>
+    <h2>Lessons</h2>
+    <p class="sub" id="lessonCheer"></p>
+    <div class="progress" id="lessonProgress" aria-hidden="true"></div>
+    <div class="card" id="lessonCard"></div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-outline" id="lessonPrev">Back</button>
+      <button type="button" class="btn" id="lessonNext">Next</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="screen" aria-label="Quiz">
+    <button type="button" class="btn-ghost" data-home>← Home</button>
+    <h2>Quick quiz</h2>
+    <p class="sub">Pass with 5 out of 7. Each answer shows a short why.</p>
+    <div class="progress" id="quizProgress" aria-hidden="true"></div>
+    <div class="card" id="quizCard"></div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="screen" aria-label="Results">
+    <button type="button" class="btn-ghost" data-home>← Home</button>
+    <h2>Results</h2>
+    <div id="scoreBanner" class="score-banner"></div>
+    <div id="badgeBlock" class="hidden">
+      <canvas id="badgeCanvas" width="640" height="400" aria-label="Step Right Up badge"></canvas>
+      <button type="button" class="btn" id="saveBadge">Save badge</button>
+    </div>
+    <div class="card mt">
+      <h3>Filing checklist</h3>
+      <ul class="checklist">
+        <li>Create your EMA account on Step Up</li>
+        <li>Add your child (K–12 eligibility)</li>
+        <li>Upload two different residency documents</li>
+        <li>Submit the application</li>
+        <li>Accept the award if offered</li>
+        <li>Know your door: FTC-PEP (homeschool), FTC/FES-EO (private), FES-UA (unique abilities)</li>
+      </ul>
+      <a class="btn mt" href="https://www.stepupforstudents.org/" target="_blank" rel="noopener">Official apply</a>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-outline" id="retryQuiz">Retry quiz</button>
+      <button type="button" class="btn btn-outline" id="reviewLessons">Review lessons</button>
+    </div>
+    <p class="disclaimer">This is a confidence tool, not the application and not legal advice. Always confirm deadlines, amounts, and eligibility on the official Step Up for Students site — that site is the source of truth.</p>
+  </section>
+
+  <!-- THE WATCH -->
+  <section id="watch" class="screen" aria-label="The Watch">
+    <button type="button" class="btn-ghost" data-home>← Home</button>
+    <h2>The Watch</h2>
+    <p class="sub">Tap the gold circles before five hit the bottom. Pointer and touch friendly.</p>
+    <div class="watch-hud">
+      <span>Crushed: <strong id="watchScore">0</strong></span>
+      <span>Misses: <strong id="watchMisses">0</strong> / 5</span>
+    </div>
+    <div class="watch-wrap">
+      <canvas id="watchCanvas" width="480" height="640"></canvas>
+    </div>
+    <div id="watchOver" class="score-banner fail hidden mt">
+      <p style="margin:0 0 8px;font-size:1.2rem;font-weight:700;">Watch ended</p>
+      <p class="sub" style="margin:0;" id="watchFinal"></p>
+    </div>
+    <button type="button" class="btn mt" id="watchReplay">Start / Replay</button>
+  </section>
+
+</div>
+<script>
+(function () {
+  "use strict";
+
+  var filer = "Mom";
+  var lessonIndex = 0;
+  var quizIndex = 0;
+  var quizScore = 0;
+  var answered = false;
+
+  var lessons = [
+    {
+      title: "1 · Portal, not a school",
+      body: "Step Up for Students runs the SFO / EMA portal — the online doorway for Florida scholarship applications. It is not a school. You apply through the portal; your child learns at home, private school, or another eligible path."
+    },
+    {
+      title: "2 · Know your door",
+      body: "Homeschool families use FTC-PEP. Private school is FTC / FES-EO. Unique Abilities (UA) is FES-UA. Pick the door that matches how your child will learn — mixing doors wrong slows the file."
+    },
+    {
+      title: "3 · Who can apply",
+      body: "You need Florida residency and a K–12 eligible student. Kindergarten means age 5 by September 1. Confirm your child's age and residency docs before you start the EMA account."
+    },
+    {
+      title: "4 · Income is priority, not a wall",
+      body: "Income helps set priority for awards. It is not an automatic lockout for every path. File completely and on time — priority rules move, and a clean application still matters."
+    },
+    {
+      title: "5 · Funding is not guaranteed",
+      body: "An award is not promised just because you applied. You also cannot stack a full scholarship with full-time public school funding. Plan as if you may wait — and celebrate when the award lands."
+    },
+    {
+      title: "6 · The scale is real",
+      body: "For 2025–26, scale was roughly 286,000 private-school scholarships, about 79,000 PEP awards, and about 3,700 PEP in Duval. The 2026–27 season saw about 200,000 applications in the first three days. File early; volume is high."
+    },
+    {
+      title: "7 · Process, deadlines & PEP dollars",
+      body: "Process: EMA account → add child → two different residency documents → submit → accept award. PEP new applications close April 30; private-school new apps close November 15. PEP funding is about $7,700–$8,500 for curriculum, testing, and tutoring. Farm days count only if the provider is approved."
+    }
+  ];
+
+  var quiz = [
+    {
+      q: "What is Step Up for Students in this process?",
+      choices: [
+        "A K–12 public school",
+        "The SFO / EMA portal for scholarship applications",
+        "A private academy in Jacksonville",
+        "A tutoring company"
+      ],
+      answer: 1,
+      why: "Step Up runs the SFO/EMA portal — not a school."
+    },
+    {
+      q: "Which door is for homeschool (PEP)?",
+      choices: [
+        "FTC / FES-EO",
+        "FES-UA",
+        "FTC-PEP",
+        "Full-time public enrollment"
+      ],
+      answer: 2,
+      why: "Homeschool uses FTC-PEP; private is FTC/FES-EO; UA is FES-UA."
+    },
+    {
+      q: "For Kindergarten eligibility, a child generally must be age 5 by…",
+      choices: [
+        "January 1",
+        "June 30",
+        "September 1",
+        "December 31"
+      ],
+      answer: 2,
+      why: "K means age 5 by September 1, plus Florida residency and K–12 eligibility."
+    },
+    {
+      q: "How should families think about income?",
+      choices: [
+        "Income always blocks every scholarship",
+        "Income is a priority factor, not an automatic wall",
+        "Income is never reviewed",
+        "Only households under $20k may apply"
+      ],
+      answer: 1,
+      why: "Income affects priority — it is not a simple lockout for every door."
+    },
+    {
+      q: "Which statement is true about funding?",
+      choices: [
+        "Every complete application is guaranteed an award",
+        "You can stack a full scholarship with full-time public funding",
+        "Funding is not guaranteed, and you cannot stack full-time public funding",
+        "Awards auto-renew with no acceptance step"
+      ],
+      answer: 2,
+      why: "Awards are not guaranteed; full-time public funding does not stack with a full scholarship."
+    },
+    {
+      q: "Which scale ballpark matches recent seasons?",
+      choices: [
+        "~10k private scholarships and ~500 PEP statewide",
+        "~286k private-school scholarships, ~79k PEP, ~3,700 PEP in Duval; ~200k apps in the first 3 days of 2026–27",
+        "Only Duval County awards scholarships",
+        "Fewer than 1,000 total awards last year"
+      ],
+      answer: 1,
+      why: "Volume is huge — file early and keep docs ready."
+    },
+    {
+      q: "Which process & deadline set is correct?",
+      choices: [
+        "One residency doc, submit, done — no deadlines",
+        "EMA → add child → two different residency docs → submit → accept; PEP new apps close Apr 30; private new apps Nov 15; PEP ~$7700–8500 (farm days only if provider approved)",
+        "Apply only by phone; PEP closes August 1",
+        "No EMA account needed; awards appear automatically"
+      ],
+      answer: 1,
+      why: "Two different residency docs, accept the award, and watch PEP vs private deadlines."
+    }
+  ];
+
+  function $(id) { return document.getElementById(id); }
+  function show(id) {
+    document.querySelectorAll(".screen").forEach(function (el) {
+      el.classList.remove("active");
+    });
+    $(id).classList.add("active");
+    window.scrollTo(0, 0);
+  }
+
+  document.querySelectorAll("[data-home]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      stopWatch();
+      show("home");
+    });
+  });
+
+  $("goStep").addEventListener("click", function () { show("filer"); });
+  $("goWatch").addEventListener("click", function () {
+    show("watch");
+    resizeWatch();
+    if (!watchRunning && watchMisses === 0 && watchScore === 0) {
+      /* idle until Start */
+    }
+  });
+
+  document.querySelectorAll(".filer-opt").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".filer-opt").forEach(function (b) { b.classList.remove("selected"); });
+      btn.classList.add("selected");
+      filer = btn.getAttribute("data-filer");
+      try { localStorage.setItem("sru-filer", filer); } catch (e) {}
+      $("filerCheer").textContent = cheerLine(filer);
+    });
+  });
+
+  function cheerLine(name) {
+    var map = {
+      Mom: "You've got this, Mom.",
+      Dad: "You've got this, Dad.",
+      Grandma: "You've got this, Grandma.",
+      Auntie: "You've got this, Auntie."
+    };
+    return map[name] || ("You've got this, " + name + ".");
+  }
+
+  try {
+    var saved = localStorage.getItem("sru-filer");
+    if (saved) {
+      filer = saved;
+      document.querySelectorAll(".filer-opt").forEach(function (b) {
+        b.classList.toggle("selected", b.getAttribute("data-filer") === filer);
+      });
+      $("filerCheer").textContent = cheerLine(filer);
+    }
+  } catch (e) {}
+
+  $("startLessons").addEventListener("click", function () {
+    lessonIndex = 0;
+    $("lessonCheer").textContent = cheerLine(filer) + " Seven cards — tap Next when ready.";
+    renderLesson();
+    show("lessons");
+  });
+
+  function renderProgress(el, total, current, mode) {
+    el.innerHTML = "";
+    for (var i = 0; i < total; i++) {
+      var s = document.createElement("span");
+      if (mode === "lesson") {
+        if (i < current) s.className = "done";
+        else if (i === current) s.className = "on";
+      } else {
+        if (i < current) s.className = "done";
+        else if (i === current) s.className = "on";
+      }
+      el.appendChild(s);
+    }
+  }
+
+  function renderLesson() {
+    var L = lessons[lessonIndex];
+    $("lessonCard").innerHTML = "<h3>" + L.title + "</h3><p>" + L.body + "</p>";
+    renderProgress($("lessonProgress"), lessons.length, lessonIndex, "lesson");
+    $("lessonPrev").disabled = lessonIndex === 0;
+    $("lessonPrev").style.opacity = lessonIndex === 0 ? "0.4" : "1";
+    $("lessonNext").textContent = lessonIndex === lessons.length - 1 ? "Take the quiz" : "Next";
+  }
+
+  $("lessonPrev").addEventListener("click", function () {
+    if (lessonIndex > 0) { lessonIndex--; renderLesson(); }
+  });
+  $("lessonNext").addEventListener("click", function () {
+    if (lessonIndex < lessons.length - 1) {
+      lessonIndex++;
+      renderLesson();
+    } else {
+      startQuiz();
+    }
+  });
+
+  function startQuiz() {
+    quizIndex = 0;
+    quizScore = 0;
+    answered = false;
+    renderQuiz();
+    show("quiz");
+  }
+
+  function renderQuiz() {
+    var Q = quiz[quizIndex];
+    renderProgress($("quizProgress"), quiz.length, quizIndex, "quiz");
+    var html = "<h3>Question " + (quizIndex + 1) + " of " + quiz.length + "</h3>";
+    html += "<p>" + Q.q + "</p><div id='quizChoices'></div><div id='quizWhy' class='hidden'></div>";
+    html += "<button type='button' class='btn mt hidden' id='quizContinue'>Continue</button>";
+    $("quizCard").innerHTML = html;
+    var box = $("quizChoices");
+    Q.choices.forEach(function (c, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "quiz-opt";
+      b.textContent = c;
+      b.addEventListener("click", function () { pickAnswer(i); });
+      box.appendChild(b);
+    });
+    $("quizContinue").addEventListener("click", nextQuiz);
+    answered = false;
+  }
+
+  function pickAnswer(i) {
+    if (answered) return;
+    answered = true;
+    var Q = quiz[quizIndex];
+    var opts = $("quizChoices").querySelectorAll(".quiz-opt");
+    opts.forEach(function (b, idx) {
+      b.disabled = true;
+      if (idx === Q.answer) b.classList.add("correct");
+      if (idx === i && i !== Q.answer) b.classList.add("wrong");
+    });
+    if (i === Q.answer) quizScore++;
+    var why = $("quizWhy");
+    why.textContent = (i === Q.answer ? "Nice. " : "Almost — ") + Q.why;
+    why.classList.remove("hidden");
+    $("quizContinue").classList.remove("hidden");
+  }
+
+  function nextQuiz() {
+    if (quizIndex < quiz.length - 1) {
+      quizIndex++;
+      renderQuiz();
+    } else {
+      showResults();
+    }
+  }
+
+  function showResults() {
+    var pass = quizScore >= 5;
+    var banner = $("scoreBanner");
+    banner.className = "score-banner " + (pass ? "pass" : "fail");
+    banner.innerHTML = pass
+      ? "<p style='margin:0;font-size:1.25rem;font-weight:700;'>You passed, " + filer + "!</p><p class='sub' style='margin:8px 0 0;'>" + quizScore + " / 7 — Filed It energy.</p>"
+      : "<p style='margin:0;font-size:1.25rem;font-weight:700;'>Almost there, " + filer + "</p><p class='sub' style='margin:8px 0 0;'>" + quizScore + " / 7 — pass at 5/7. Review and retry.</p>";
+    if (pass) {
+      $("badgeBlock").classList.remove("hidden");
+      drawBadge(quizScore);
+    } else {
+      $("badgeBlock").classList.add("hidden");
+    }
+    show("results");
+  }
+
+  function drawBadge(score) {
+    var c = $("badgeCanvas");
+    var ctx = c.getContext("2d");
+    var w = c.width, h = c.height;
+    ctx.fillStyle = "#1e3428";
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "#c4a35a";
+    ctx.lineWidth = 8;
+    roundRect(ctx, 24, 24, w - 48, h - 48, 24);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(245,240,230,0.06)";
+    ctx.font = "bold 42px system-ui,sans-serif";
+    ctx.textAlign = "center";
+    ctx.save();
+    ctx.translate(w / 2, h / 2);
+    ctx.rotate(-0.25);
+    ctx.fillText("Critters on Call", 0, 0);
+    ctx.restore();
+    ctx.fillStyle = "#c4a35a";
+    ctx.font = "bold 36px system-ui,sans-serif";
+    ctx.fillText("STEP RIGHT UP", w / 2, 110);
+    ctx.fillStyle = "#f5f0e6";
+    ctx.font = "bold 48px system-ui,sans-serif";
+    ctx.fillText("Filed It", w / 2, 190);
+    ctx.font = "28px system-ui,sans-serif";
+    ctx.fillStyle = "#c4a35a";
+    ctx.fillText(score + " / 7", w / 2, 250);
+    ctx.fillStyle = "#f5f0e6";
+    ctx.font = "22px system-ui,sans-serif";
+    ctx.fillText("Critters on Call", w / 2, 310);
+    ctx.font = "18px system-ui,sans-serif";
+    ctx.fillStyle = "rgba(245,240,230,0.7)";
+    ctx.fillText("Sheehan Homestead", w / 2, 345);
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  $("saveBadge").addEventListener("click", function () {
+    var c = $("badgeCanvas");
+    var a = document.createElement("a");
+    a.href = c.toDataURL("image/png");
+    a.download = "step-right-up-badge.png";
+    a.click();
+  });
+
+  $("retryQuiz").addEventListener("click", startQuiz);
+  $("reviewLessons").addEventListener("click", function () {
+    lessonIndex = 0;
+    $("lessonCheer").textContent = cheerLine(filer);
+    renderLesson();
+    show("lessons");
+  });
+
+  /* ========== THE WATCH ========== */
+  var labels = [
+    "Step Up upload", "Co-op text", "Portfolio", "Dinner", "Carpool",
+    "Snack request", "Learning plan", "Field trip", "Bedtime", "Doctor form"
+  ];
+  var cheers = [
+    "You're on it.", "Mom mode activated.", "Handled.", "That's a win.", "Watch secured."
+  ];
+  var watchCanvas = $("watchCanvas");
+  var wctx = watchCanvas.getContext("2d");
+  var drops = [];
+  var watchScore = 0;
+  var watchMisses = 0;
+  var watchRunning = false;
+  var watchRAF = null;
+  var spawnTimer = 0;
+  var lastTs = 0;
+  var particles = [];
+  var toasts = [];
+
+  function resizeWatch() {
+    var rect = watchCanvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    watchCanvas.width = Math.max(280, Math.floor(rect.width * dpr));
+    watchCanvas.height = Math.max(360, Math.floor(rect.height * dpr));
+    wctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+
+  function wrapText(ctx, text, maxW) {
+    var words = text.split(" ");
+    var lines = [];
+    var line = "";
+    words.forEach(function (word) {
+      var test = line ? line + " " + word : word;
+      if (ctx.measureText(test).width > maxW && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function spawnDrop() {
+    var dpr = watchCanvas.width / Math.max(1, watchCanvas.getBoundingClientRect().width);
+    var r = 36 * dpr;
+    var x = r + Math.random() * (watchCanvas.width - r * 2);
+    drops.push({
+      x: x,
+      y: -r,
+      r: r,
+      vy: (1.4 + Math.random() * 1.6) * dpr,
+      label: labels[Math.floor(Math.random() * labels.length)],
+      pop: 0
+    });
+  }
+
+  function stopWatch() {
+    watchRunning = false;
+    if (watchRAF) { cancelAnimationFrame(watchRAF); watchRAF = null; }
+  }
+
+  function startWatch() {
+    stopWatch();
+    resizeWatch();
+    drops = [];
+    particles = [];
+    toasts = [];
+    watchScore = 0;
+    watchMisses = 0;
+    spawnTimer = 0;
+    lastTs = 0;
+    $("watchScore").textContent = "0";
+    $("watchMisses").textContent = "0";
+    $("watchOver").classList.add("hidden");
+    watchRunning = true;
+    watchRAF = requestAnimationFrame(watchLoop);
+  }
+
+  function endWatch() {
+    watchRunning = false;
+    $("watchFinal").textContent = "Crushed " + watchScore + ". Tap Replay to secure the watch again.";
+    $("watchOver").classList.remove("hidden");
+  }
+
+  function watchLoop(ts) {
+    if (!watchRunning) return;
+    if (!lastTs) lastTs = ts;
+    var dt = Math.min(32, ts - lastTs);
+    lastTs = ts;
+    spawnTimer += dt;
+    if (spawnTimer > 900) {
+      spawnTimer = 0;
+      if (drops.filter(function (d) { return d.pop === 0; }).length < 6) spawnDrop();
+    }
+    var H = watchCanvas.height;
+    for (var i = drops.length - 1; i >= 0; i--) {
+      var d = drops[i];
+      if (d.pop > 0) {
+        d.pop += dt;
+        if (d.pop > 280) drops.splice(i, 1);
+        continue;
+      }
+      d.y += d.vy * (dt / 16);
+      if (d.y - d.r > H) {
+        drops.splice(i, 1);
+        watchMisses++;
+        $("watchMisses").textContent = String(watchMisses);
+        if (watchMisses >= 5) {
+          drawWatchFrame();
+          endWatch();
+          return;
+        }
+      }
+    }
+    for (var p = particles.length - 1; p >= 0; p--) {
+      var pt = particles[p];
+      pt.life -= dt;
+      pt.x += pt.vx * (dt / 16);
+      pt.y += pt.vy * (dt / 16);
+      if (pt.life <= 0) particles.splice(p, 1);
+    }
+    for (var t = toasts.length - 1; t >= 0; t--) {
+      toasts[t].life -= dt;
+      toasts[t].y -= 0.4 * (dt / 16);
+      if (toasts[t].life <= 0) toasts.splice(t, 1);
+    }
+    drawWatchFrame();
+    watchRAF = requestAnimationFrame(watchLoop);
+  }
+
+  function drawWatchFrame() {
+    var W = watchCanvas.width, H = watchCanvas.height;
+    wctx.fillStyle = "#2c4a38";
+    wctx.fillRect(0, 0, W, H);
+    wctx.fillStyle = "rgba(245,240,230,0.04)";
+    wctx.font = "bold " + Math.floor(W * 0.08) + "px system-ui,sans-serif";
+    wctx.textAlign = "center";
+    wctx.save();
+    wctx.translate(W / 2, H / 2);
+    wctx.rotate(-0.3);
+    wctx.fillText("Critters on Call", 0, 0);
+    wctx.restore();
+
+    drops.forEach(function (d) {
+      var scale = d.pop > 0 ? Math.max(0, 1 - d.pop / 280) * 1.35 : 1;
+      var alpha = d.pop > 0 ? Math.max(0, 1 - d.pop / 280) : 1;
+      wctx.save();
+      wctx.globalAlpha = alpha;
+      wctx.beginPath();
+      wctx.arc(d.x, d.y, d.r * scale, 0, Math.PI * 2);
+      wctx.fillStyle = "#c4a35a";
+      wctx.fill();
+      wctx.strokeStyle = "#f5f0e6";
+      wctx.lineWidth = 2;
+      wctx.stroke();
+      wctx.fillStyle = "#1e3428";
+      var fs = Math.max(10, Math.floor(d.r * 0.38));
+      wctx.font = "bold " + fs + "px system-ui,sans-serif";
+      wctx.textAlign = "center";
+      wctx.textBaseline = "middle";
+      var lines = wrapText(wctx, d.label, d.r * 1.5);
+      var lineH = fs * 1.15;
+      var startY = d.y - ((lines.length - 1) * lineH) / 2;
+      lines.forEach(function (ln, i) {
+        wctx.fillText(ln, d.x, startY + i * lineH);
+      });
+      wctx.restore();
+    });
+
+    particles.forEach(function (pt) {
+      wctx.globalAlpha = Math.max(0, pt.life / 400);
+      wctx.fillStyle = "#c4a35a";
+      wctx.beginPath();
+      wctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2);
+      wctx.fill();
+      wctx.globalAlpha = 1;
+    });
+
+    toasts.forEach(function (t) {
+      wctx.globalAlpha = Math.max(0, t.life / 900);
+      wctx.fillStyle = "#c4a35a";
+      wctx.font = "bold " + Math.floor(watchCanvas.width * 0.045) + "px system-ui,sans-serif";
+      wctx.textAlign = "center";
+      wctx.fillText(t.text, t.x, t.y);
+      wctx.globalAlpha = 1;
+    });
+  }
+
+  function crushAt(clientX, clientY) {
+    if (!watchRunning) return;
+    var rect = watchCanvas.getBoundingClientRect();
+    var x = (clientX - rect.left) * (watchCanvas.width / rect.width);
+    var y = (clientY - rect.top) * (watchCanvas.height / rect.height);
+    for (var i = drops.length - 1; i >= 0; i--) {
+      var d = drops[i];
+      if (d.pop > 0) continue;
+      var dx = x - d.x, dy = y - d.y;
+      if (dx * dx + dy * dy <= d.r * d.r * 1.15) {
+        d.pop = 1;
+        watchScore++;
+        $("watchScore").textContent = String(watchScore);
+        for (var k = 0; k < 8; k++) {
+          particles.push({
+            x: d.x, y: d.y,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+            r: 3 + Math.random() * 4,
+            life: 300 + Math.random() * 200
+          });
+        }
+        toasts.push({
+          x: d.x, y: d.y - d.r,
+          text: cheers[Math.floor(Math.random() * cheers.length)],
+          life: 900
+        });
+        break;
+      }
+    }
+  }
+
+  watchCanvas.addEventListener("pointerdown", function (e) {
+    e.preventDefault();
+    try { watchCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+    crushAt(e.clientX, e.clientY);
+  });
+
+  $("watchReplay").addEventListener("click", startWatch);
+  window.addEventListener("resize", function () {
+    if ($("watch").classList.contains("active")) resizeWatch();
+  });
+
+})();
+</script>
+</body>
+</html>
