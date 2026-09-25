@@ -99,6 +99,35 @@
     #watch { width: 100%; height: 440px; background: #0f1812; border-radius: 16px; display: block; touch-action: manipulation; }
     .hud { display: flex; justify-content: space-between; font-size: 13px; color: var(--gold-2); margin: 8px 0; }
     .toast { min-height: 44px; font-size: 14px; color: #f6efe2; text-align: center; margin-top: 8px; }
+
+    .writein { margin-top: 4px; }
+    .writein input {
+      width: 100%; border: 1px solid rgba(196,163,90,.4);
+      background: rgba(255,250,241,.1); color: var(--paper);
+      border-radius: 14px; padding: 12px 14px; font: inherit; margin: 8px 0;
+    }
+    .writein input::placeholder { color: #b9a888; }
+    .writein .err {
+      min-height: 20px; font-size: 13px; color: #e3c77a; text-align: center;
+      margin-bottom: 4px;
+    }
+    .writein.shake input { animation: shake .38s ease; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-7px); }
+      40% { transform: translateX(7px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .thumb {
+      width: 72px; height: 72px; border-radius: 12px;
+      display: grid; place-items: center;
+      font-family: Fraunces, Georgia, serif; font-size: 13px; font-weight: 700;
+      letter-spacing: .04em; color: var(--gold);
+      background: linear-gradient(160deg, #3d5c47, #1a2a20);
+      border: 1px solid rgba(196,163,90,.35);
+    }
+    .seat-selected { outline: 2px solid var(--gold); }
   </style>
 </head>
 <body>
@@ -115,9 +144,30 @@ const OFFICIAL = "https://www.stepupforstudents.org/";
 const MARK1 = "assets/wings-gate.jpg";
 const MARK2 = "assets/watch-crest.jpg";
 
+const BLOCKED = [
+  "fuck","fucker","fucking","shit","bitch","cunt","nigger","nigga","faggot",
+  "retard","cock","dick","pussy","asshole","slut","whore","porn","penis","vagina",
+  "rape","rapist","semen","cum","jizz","blowjob","handjob","anal","boob","tits","tit"
+];
+
+function loadSeat() {
+  try {
+    const raw = localStorage.getItem("sru-seat");
+    if (!raw) return { role: "mom", customName: "" };
+    const parsed = JSON.parse(raw);
+    const role = typeof parsed.role === "string" ? parsed.role : "mom";
+    const customName = typeof parsed.customName === "string" ? parsed.customName : "";
+    return { role, customName };
+  } catch (e) {
+    return { role: "mom", customName: "" };
+  }
+}
+const seat0 = loadSeat();
+
 const state = {
   screen: "home",
-  role: "mom",
+  role: seat0.role,
+  customName: seat0.customName,
   lesson: 0,
   q: 0,
   score: 0,
@@ -131,8 +181,47 @@ const ROLES = {
   mom: { title: "Mom", badge: "Filed It", line: "You know enough to open the portal." },
   dad: { title: "Dad", badge: "Filed It", line: "You sat down and learned the door." },
   grandma: { title: "Grandma", badge: "Filed It", line: "You turned a form into options." },
-  auntie: { title: "Auntie", badge: "Filed It", line: "You did the grown-up tab." }
+  auntie: { title: "Auntie", badge: "Filed It", line: "You did the grown-up tab." },
+  friends: { title: "Two friends", badge: "Filed It", line: "You opened the portal together." },
+  writein: { title: "Write it in", badge: "Filed It", line: "You know enough to open the portal." }
 };
+
+function playerName() {
+  if (state.role === "writein") {
+    const n = (state.customName || "").trim();
+    return n || "You";
+  }
+  return (ROLES[state.role] || ROLES.mom).title;
+}
+
+function persistSeat() {
+  localStorage.setItem("sru-seat", JSON.stringify({
+    role: state.role,
+    customName: state.customName || ""
+  }));
+}
+
+function cleanWriteIn(raw) {
+  return String(raw || "")
+    .replace(/[^A-Za-z0-9 '\-]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 24);
+}
+
+function writeInAllowed(name) {
+  if (!name) return false;
+  if (!/^[A-Za-z0-9 '\-]{1,24}$/.test(name)) return false;
+  const tokens = name.toLowerCase().split(/[\s'\-]+/).filter(Boolean);
+  for (const t of tokens) {
+    if (BLOCKED.includes(t)) return false;
+  }
+  const compact = name.toLowerCase().replace(/[\s'\-]/g, "");
+  for (const bad of BLOCKED) {
+    if (bad.length >= 4 && compact.includes(bad)) return false;
+  }
+  return true;
+}
 
 const LESSONS = [
   {
@@ -269,22 +358,23 @@ const QUIZ = [
 ];
 
 const ROCKS = [
-  ["Step Up upload", "You do paperwork in a loud house. That is a skill."],
-  ["Co-op text", "The thread lives because you sent the pin."],
-  ["Portfolio", "You kept the proof. Future-you needed that."],
-  ["Dinner", "They ate. Civilization held."],
-  ["Carpool", "You moved small humans across a county."],
-  ["Snack request", "Fourteenth snack. Still standing."],
-  ["Learning plan", "You wrote the year down. That is a curriculum."],
-  ["Field trip", "You booked dirt instead of another worksheet."],
-  ["Bedtime", "You closed the day. Quiet is a product."],
-  ["Doctor form", "You hunted a PDF like it owed you money."]
+  ["Step Up upload", "You got the upload in."],
+  ["Co-op text", "You sent the pin."],
+  ["Portfolio", "You kept the proof."],
+  ["Dinner", "You got dinner on the table."],
+  ["Carpool", "You made the handoff."],
+  ["Snack request", "You handled the snack ask."],
+  ["Learning plan", "You wrote the plan down."],
+  ["Field trip", "You locked the field trip."],
+  ["Bedtime", "You closed the day."],
+  ["Doctor form", "You got the form signed."]
 ];
 
 const $ = (id) => document.getElementById(id);
 const app = () => $("app");
 function save() {
   localStorage.setItem("sru-wings", state.wings);
+  persistSeat();
   const el = $("wings");
   if (el) el.textContent = state.wings;
 }
@@ -294,7 +384,7 @@ function home() {
   return `
     <p class="hint">Critters on Call · Florida</p>
     <h1>Step Right Up.</h1>
-    <p class="lead">Two little games. First you learn the scholarship well enough to file. Then you hold the week like the dog at the gate.</p>
+    <p class="lead">Two little games. First you learn the scholarship well enough to file. Then you clear the list that is already on your phone.</p>
     <div class="grid">
       <button class="card-btn game-card" onclick="startStep()">
         <img src="${MARK1}" alt="" />
@@ -304,10 +394,10 @@ function home() {
         </div>
       </button>
       <button class="card-btn game-card" onclick="go('watch')">
-        <img src="${MARK2}" alt="" />
+        <div class="thumb">WEEK</div>
         <div>
-          <b>The Watch</b>
-          <span>Responsibilities fall. You tap them out. Same job as the Pyrenees.</span>
+          <b>Your Week</b>
+          <span>The list on her phone. Tap each to-do before five drop.</span>
         </div>
       </button>
     </div>
@@ -321,26 +411,72 @@ function startStep() {
 }
 
 function role() {
+  const presets = ["mom", "dad", "grandma", "auntie", "friends"];
+  const selected = state.role;
   return `
     <img class="mark small" src="${MARK1}" alt="" />
     <p class="hint">Module 1</p>
     <h2>Who is filing</h2>
     <p class="lead">Start as Mom. Switch seats if someone else opens the laptop.</p>
     <div class="grid">
-      ${Object.entries(ROLES).map(([id, r]) => `
-        <button class="card-btn" onclick="pickRole('${id}')"><b>${r.title}</b></button>
-      `).join("")}
+      ${presets.map((id) => {
+        const r = ROLES[id];
+        const sel = selected === id ? " seat-selected" : "";
+        return `<button class="card-btn${sel}" onclick="pickRole('${id}')"><b>${r.title}</b></button>`;
+      }).join("")}
+    </div>
+    <div class="writein" id="writein-box">
+      <button class="card-btn${selected === "writein" ? " seat-selected" : ""}" type="button" onclick="showWriteIn()"><b>Write it in</b></button>
+      <input id="writein-input" maxlength="24" autocomplete="off" placeholder="That’s me — short name or role"
+        value="${selected === "writein" ? escapeAttr(state.customName || "") : ""}"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();confirmWriteIn();}" />
+      <div class="err" id="writein-err"></div>
+      <button class="btn primary" type="button" onclick="confirmWriteIn()">Continue as that</button>
     </div>
     <button class="btn ghost" onclick="go('home')">Both games</button>
   `;
 }
-function pickRole(id) { state.role = id; go("lesson"); }
+function escapeAttr(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+}
+function showWriteIn() {
+  state.role = "writein";
+  const input = document.getElementById("writein-input");
+  if (input) input.focus();
+}
+function pickRole(id) {
+  state.role = id;
+  if (id !== "writein") state.customName = "";
+  persistSeat();
+  go("lesson");
+}
+function confirmWriteIn() {
+  const input = document.getElementById("writein-input");
+  const box = document.getElementById("writein-box");
+  const err = document.getElementById("writein-err");
+  const cleaned = cleanWriteIn(input ? input.value : "");
+  if (input) input.value = cleaned;
+  if (!writeInAllowed(cleaned)) {
+    if (err) err.textContent = "Try another name.";
+    if (box) {
+      box.classList.remove("shake");
+      void box.offsetWidth;
+      box.classList.add("shake");
+    }
+    return;
+  }
+  if (err) err.textContent = "";
+  state.role = "writein";
+  state.customName = cleaned;
+  persistSeat();
+  go("lesson");
+}
 
 function lesson() {
   const L = LESSONS[state.lesson];
   const pct = Math.round((state.lesson / LESSONS.length) * 100);
   return `
-    <p class="hint">${ROLES[state.role].title} · Step Right Up</p>
+    <p class="hint">${playerName()} · Step Right Up</p>
     <div class="meter"><i style="width:${pct}%"></i></div>
     <div class="lesson">
       <div class="tag">${L.tag}</div>
@@ -421,7 +557,7 @@ function paintBadge() {
     ctx.fillText(ROLES[state.role].badge, w/2, 118);
     ctx.fillStyle = "#e3c77a";
     ctx.font = "15px Source Sans 3, sans-serif";
-    ctx.fillText(state.score + " / " + QUIZ.length + " · " + ROLES[state.role].title, w/2, 148);
+    ctx.fillText(state.score + " / " + QUIZ.length + " · " + playerName(), w/2, 148);
     ctx.fillStyle = "#c4a35a";
     ctx.font = "12px Source Sans 3, sans-serif";
     ctx.fillText("CRITTERS ON CALL · CALLAHAN / JAX", w/2, 228);
@@ -479,7 +615,7 @@ function wings() {
       </ol>
     </div>
     <a class="btn primary" style="display:block;text-decoration:none" href="${OFFICIAL}" target="_blank" rel="noopener">Official apply</a>
-    <button class="btn ghost" onclick="go('watch')">Play The Watch</button>
+    <button class="btn ghost" onclick="go('watch')">Play Your Week</button>
     <button class="btn ghost" onclick="startStep()">Replay</button>
     <p class="tiny">2025–26 counts from Step Up fact sheets. Trust the portal when numbers move.</p>
   `;
@@ -487,12 +623,12 @@ function wings() {
 
 function watchScreen() {
   setTimeout(bootWatch, 30);
+  const who = playerName();
   return `
-    <img class="mark small" src="${MARK2}" alt="" />
-    <p class="hint">Module 2 · The Watch</p>
-    <h2>Hold the gate.</h2>
-    <p class="lead">Same job as the Pyrenees. The rocks are the week.</p>
-    <div class="hud"><span>Held <b id="held">0</b></span><span>Dropped <b id="dropped">0</b>/5</span></div>
+    <p class="hint">Module 2 · Your Week</p>
+    <h2>Hold it, ${who}.</h2>
+    <p class="lead">The list that is already on her phone. Tap each to-do before five drop.</p>
+    <div class="hud"><span>Cleared <b id="held">0</b></span><span>Dropped <b id="dropped">0</b>/5</span></div>
     <canvas id="watch" width="400" height="440"></canvas>
     <div class="toast" id="toast">Tap what falls.</div>
     <button class="btn ghost" onclick="stopWatch(); go('home')">Both games</button>
@@ -582,10 +718,10 @@ function bootWatch() {
       ctx.fillStyle = "#e3c77a";
       ctx.textAlign = "center";
       ctx.font = "700 28px Fraunces, Georgia, serif";
-      ctx.fillText("Watch ended", canvas.width / 2, 190);
+      ctx.fillText("Week ended", canvas.width / 2, 190);
       ctx.fillStyle = "#f6efe2";
       ctx.font = "16px Source Sans 3, sans-serif";
-      ctx.fillText(held + " held. Tap to stand the watch again.", canvas.width / 2, 224);
+      ctx.fillText(held + " cleared. Tap to hold it again.", canvas.width / 2, 224);
       return;
     }
     state.watch.raf = requestAnimationFrame(tick);
