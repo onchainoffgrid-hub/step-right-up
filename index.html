@@ -82,7 +82,8 @@
     }
     .lesson p { font-size: 15px; line-height: 1.45; margin-top: 6px; }
     .lesson ul { margin: 8px 0 0 18px; font-size: 14px; line-height: 1.45; }
-    .why { margin-top: 10px; font-size: 13px; color: #5a4630; }
+    .lesson a { color: var(--gold-deep); font-weight: 700; }
+    .check a { color: var(--gold-2); }
     .meter { height: 8px; background: #2a382f; border-radius: 99px; overflow: hidden; margin: 8px 0 12px; }
     .meter > i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), #f3e0a6); }
     .choice { background: #fff; color: var(--ink); }
@@ -99,35 +100,6 @@
     #watch { width: 100%; height: 440px; background: #0f1812; border-radius: 16px; display: block; touch-action: manipulation; }
     .hud { display: flex; justify-content: space-between; font-size: 13px; color: var(--gold-2); margin: 8px 0; }
     .toast { min-height: 44px; font-size: 14px; color: #f6efe2; text-align: center; margin-top: 8px; }
-
-    .writein { margin-top: 4px; }
-    .writein input {
-      width: 100%; border: 1px solid rgba(196,163,90,.4);
-      background: rgba(255,250,241,.1); color: var(--paper);
-      border-radius: 14px; padding: 12px 14px; font: inherit; margin: 8px 0;
-    }
-    .writein input::placeholder { color: #b9a888; }
-    .writein .err {
-      min-height: 20px; font-size: 13px; color: #e3c77a; text-align: center;
-      margin-bottom: 4px;
-    }
-    .writein.shake input { animation: shake .38s ease; }
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      20% { transform: translateX(-7px); }
-      40% { transform: translateX(7px); }
-      60% { transform: translateX(-5px); }
-      80% { transform: translateX(5px); }
-    }
-    .thumb {
-      width: 72px; height: 72px; border-radius: 12px;
-      display: grid; place-items: center;
-      font-family: Fraunces, Georgia, serif; font-size: 13px; font-weight: 700;
-      letter-spacing: .04em; color: var(--gold);
-      background: linear-gradient(160deg, #3d5c47, #1a2a20);
-      border: 1px solid rgba(196,163,90,.35);
-    }
-    .seat-selected { outline: 2px solid var(--gold); }
   </style>
 </head>
 <body>
@@ -141,33 +113,15 @@
   </div>
 <script>
 const OFFICIAL = "https://www.stepupforstudents.org/";
-const MARK1 = "assets/wings-gate.jpg";
-const MARK2 = "assets/watch-crest.jpg";
-
-const BLOCKED = [
-  "fuck","fucker","fucking","shit","bitch","cunt","nigger","nigga","faggot",
-  "retard","cock","dick","pussy","asshole","slut","whore","porn","penis","vagina",
-  "rape","rapist","semen","cum","jizz","blowjob","handjob","anal","boob","tits","tit"
-];
-
-function loadSeat() {
-  try {
-    const raw = localStorage.getItem("sru-seat");
-    if (!raw) return { role: "mom", customName: "" };
-    const parsed = JSON.parse(raw);
-    const role = typeof parsed.role === "string" ? parsed.role : "mom";
-    const customName = typeof parsed.customName === "string" ? parsed.customName : "";
-    return { role, customName };
-  } catch (e) {
-    return { role: "mom", customName: "" };
-  }
-}
-const seat0 = loadSeat();
+const APPLY = "https://www.stepupforstudents.org/scholarships/private-school/apply/";
+const PEP = "https://www.stepupforstudents.org/handbook-web/pep-family-handbook/";
+const DATES = "https://www.stepupforstudents.org/faq/faqs-for-2026-27-scholarship-deadlines-and-payment-schedules/";
+const MARK1 = "step-right-up-mark.jpg";
+const MARK2 = "the-watch-mark.jpg";
 
 const state = {
   screen: "home",
-  role: seat0.role,
-  customName: seat0.customName,
+  role: "mom",
   lesson: 0,
   q: 0,
   score: 0,
@@ -182,53 +136,17 @@ const ROLES = {
   dad: { title: "Dad", badge: "Filed It", line: "You sat down and learned the door." },
   grandma: { title: "Grandma", badge: "Filed It", line: "You turned a form into options." },
   auntie: { title: "Auntie", badge: "Filed It", line: "You did the grown-up tab." },
-  friends: { title: "Two friends", badge: "Filed It", line: "You opened the portal together." },
-  writein: { title: "Write it in", badge: "Filed It", line: "You know enough to open the portal." }
+  friends: { title: "Two friends", badge: "Filed It", line: "You two actually opened the laptop." },
+  writein: { title: "That’s me", badge: "Filed It", line: "You wrote yourself in. That counts." }
 };
-
-function playerName() {
-  if (state.role === "writein") {
-    const n = (state.customName || "").trim();
-    return n || "You";
-  }
-  return (ROLES[state.role] || ROLES.mom).title;
-}
-
-function persistSeat() {
-  localStorage.setItem("sru-seat", JSON.stringify({
-    role: state.role,
-    customName: state.customName || ""
-  }));
-}
-
-function cleanWriteIn(raw) {
-  return String(raw || "")
-    .replace(/[^A-Za-z0-9 '\-]/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 24);
-}
-
-function writeInAllowed(name) {
-  if (!name) return false;
-  if (!/^[A-Za-z0-9 '\-]{1,24}$/.test(name)) return false;
-  const tokens = name.toLowerCase().split(/[\s'\-]+/).filter(Boolean);
-  for (const t of tokens) {
-    if (BLOCKED.includes(t)) return false;
-  }
-  const compact = name.toLowerCase().replace(/[\s'\-]/g, "");
-  for (const bad of BLOCKED) {
-    if (bad.length >= 4 && compact.includes(bad)) return false;
-  }
-  return true;
-}
 
 const LESSONS = [
   {
     tag: "1 of 7 · What it is",
     title: "Step Up is the booth. Not the school.",
     body: "Step Up For Students is a Florida nonprofit that runs the scholarship portal (EMA), checks documents, and moves the money. You apply there. Not in a Facebook group. Not at a farm.",
-    bullets: ["They administer Florida’s choice scholarships.", "2025–26: they funded 520,000+ students.", "Bookmark stepupforstudents.org and ignore look-alike sites."]
+    bullets: ["They administer Florida’s choice scholarships.", "2025–26: they funded 520,000+ students.", "Use the real site. Ignore look-alikes."],
+    href: OFFICIAL, hrefLabel: "stepupforstudents.org — live"
   },
   {
     tag: "2 of 7 · Pick a door",
@@ -238,14 +156,15 @@ const LESSONS = [
       "Home / custom / not full-time in a school → FTC-PEP.",
       "Private school full-time → FTC / FES-EO.",
       "Documented unique ability or IEP → FES-UA (as early as age 3)."
-    ]
+    ],
+    href: PEP, hrefLabel: "PEP handbook — live"
   },
   {
     tag: "3 of 7 · Who gets in line",
     title: "Florida kid. That is the gate.",
     body: "PEP and the private-school scholarships need a Florida resident (or an active-duty military dependent with PCS orders to Florida) who can enroll in K–12. Kindergarten: five on or before September 1.",
     bullets: [
-      "Income is PRIORITY, not a wall. Lower income first (~185% FPL, then toward 400%, then others).",
+      "Income is priority, not a locked door. Lower income goes first.",
       "Funding is not promised. Deadlines and capacity decide.",
       "Full-time public-school funding and this scholarship do not stack."
     ]
@@ -253,12 +172,11 @@ const LESSONS = [
   {
     tag: "4 of 7 · You are not early",
     title: "Jacksonville already does this.",
-    body: "The weird feeling is the only thing you have to crush. The line is already long. (2025–26 Step Up fact-sheet range — portal wins if numbers move.)",
+    body: "The weird feeling is the only thing you have to crush. The line is already long.",
     bullets: [
-      "FTC + FES-EO private-school scholarships: about 286,000 students.",
+      "Private-school scholarships, 2025–26: about 286,000 students.",
       "PEP accounts: about 79,000 funded statewide.",
-      "Duval County PEP: about 3,700.",
-      "520,000+ students funded across Step Up programs.",
+      "Duval County: about 3,700 PEP students.",
       "Feb 2026 season open: 200,000 applications in three days."
     ]
   },
@@ -272,7 +190,8 @@ const LESSONS = [
       "Upload two different Florida residency proofs. Age proof for K/1. Military LES + PCS if that is you.",
       "Submit, then kill blurry uploads when they nag.",
       "Accept the award. Unaccepted money leaves."
-    ]
+    ],
+    href: APPLY, hrefLabel: "Apply in EMA — live"
   },
   {
     tag: "6 of 7 · The date trap",
@@ -284,7 +203,8 @@ const LESSONS = [
       "2026–27 new private school / UA: Feb 1–Nov 15.",
       "New private-school awards: accept by Dec 15.",
       "Active-duty military can get deadline exceptions. Still upload the papers."
-    ]
+    ],
+    href: DATES, hrefLabel: "2026–27 dates — live"
   },
   {
     tag: "7 of 7 · What the money is",
@@ -358,23 +278,32 @@ const QUIZ = [
 ];
 
 const ROCKS = [
-  ["Step Up upload", "You got the upload in."],
-  ["Co-op text", "You sent the pin."],
-  ["Portfolio", "You kept the proof."],
-  ["Dinner", "You got dinner on the table."],
-  ["Carpool", "You made the handoff."],
-  ["Snack request", "You handled the snack ask."],
-  ["Learning plan", "You wrote the plan down."],
-  ["Field trip", "You locked the field trip."],
-  ["Bedtime", "You closed the day."],
-  ["Doctor form", "You got the form signed."]
+  { label: "Car payment", praise: "The car still exists. That is not nothing.", color: "#e07a3d", ink: "#1c140c" },
+  { label: "Rent", praise: "Roof stayed over their heads.", color: "#c4a35a", ink: "#1c140c" },
+  { label: "Mortgage", praise: "You made the ugly payment.", color: "#8d6b2f", ink: "#f6efe2" },
+  { label: "Recital", praise: "Somebody got to the auditorium on time.", color: "#d46a9a", ink: "#1c140c" },
+  { label: "Soccer", praise: "Cleats, water, the right field.", color: "#3d8b5a", ink: "#f6efe2" },
+  { label: "Homeschool", praise: "The year is still a year because you ran it.", color: "#2c6e8b", ink: "#f6efe2" },
+  { label: "Step Up", praise: "You opened the portal. Most people talk about it.", color: "#c4a35a", ink: "#1c140c" },
+  { label: "Groceries", praise: "There is food in the house tonight.", color: "#6aa84f", ink: "#1c140c" },
+  { label: "Doctor", praise: "The form got hunted down.", color: "#4a90a4", ink: "#f6efe2" },
+  { label: "Co-op text", praise: "You sent the pin. The thread lived.", color: "#7b5ea7", ink: "#f6efe2" },
+  { label: "Portfolio", praise: "Proof, saved.", color: "#d4a017", ink: "#1c140c" },
+  { label: "Dinner", praise: "They ate. Civilization held.", color: "#d97746", ink: "#1c140c" },
+  { label: "Carpool", praise: "Small humans crossed a county.", color: "#2a9d8f", ink: "#f6efe2" },
+  { label: "Snack", praise: "Fourteenth snack. Still standing.", color: "#e9c46a", ink: "#1c140c" },
+  { label: "Bedtime", praise: "You closed the day.", color: "#3d4a8b", ink: "#f6efe2" },
+  { label: "Birthday", praise: "Someone will remember the cake.", color: "#e76f9a", ink: "#1c140c" },
+  { label: "Oil change", praise: "The minivan did not get a vote.", color: "#6d6a63", ink: "#f6efe2" },
+  { label: "Laundry", praise: "A clean shirt appeared. Magic.", color: "#5b8def", ink: "#f6efe2" },
+  { label: "Field trip", praise: "Dirt instead of another worksheet.", color: "#4f7d4a", ink: "#f6efe2" },
+  { label: "IEP call", praise: "You stayed on the line.", color: "#b56576", ink: "#f6efe2" }
 ];
 
 const $ = (id) => document.getElementById(id);
 const app = () => $("app");
 function save() {
   localStorage.setItem("sru-wings", state.wings);
-  persistSeat();
   const el = $("wings");
   if (el) el.textContent = state.wings;
 }
@@ -394,10 +323,10 @@ function home() {
         </div>
       </button>
       <button class="card-btn game-card" onclick="go('watch')">
-        <div class="thumb">WEEK</div>
+        <img src="${MARK2}" alt="" />
         <div>
           <b>Your Week</b>
-          <span>The list on her phone. Tap each to-do before five drop.</span>
+          <span>Juggling mom energy. Colored balls. Recital, soccer, the mortgage.</span>
         </div>
       </button>
     </div>
@@ -412,63 +341,44 @@ function startStep() {
 
 function role() {
   const presets = ["mom", "dad", "grandma", "auntie", "friends"];
-  const selected = state.role;
   return `
     <img class="mark small" src="${MARK1}" alt="" />
-    <p class="hint">Module 1</p>
+    <p class="hint">Who is playing</p>
     <h2>Who is filing</h2>
-    <p class="lead">Start as Mom. Switch seats if someone else opens the laptop.</p>
+    <p class="lead">Mom first. Or say who you actually are.</p>
     <div class="grid">
-      ${presets.map((id) => {
-        const r = ROLES[id];
-        const sel = selected === id ? " seat-selected" : "";
-        return `<button class="card-btn${sel}" onclick="pickRole('${id}')"><b>${r.title}</b></button>`;
-      }).join("")}
+      ${presets.map((id) => `
+        <button class="card-btn" onclick="pickRole('${id}')"><b>${ROLES[id].title}</b></button>
+      `).join("")}
     </div>
-    <div class="writein" id="writein-box">
-      <button class="card-btn${selected === "writein" ? " seat-selected" : ""}" type="button" onclick="showWriteIn()"><b>Write it in</b></button>
-      <input id="writein-input" maxlength="24" autocomplete="off" placeholder="That’s me — short name or role"
-        value="${selected === "writein" ? escapeAttr(state.customName || "") : ""}"
-        onkeydown="if(event.key==='Enter'){event.preventDefault();confirmWriteIn();}" />
-      <div class="err" id="writein-err"></div>
-      <button class="btn primary" type="button" onclick="confirmWriteIn()">Continue as that</button>
+    <div class="lesson" style="margin-top:10px">
+      <div class="tag">Write it in</div>
+      <p>Nana. Coach. Two friends. The person who actually does the portal.</p>
+      <input id="writein" maxlength="24" placeholder="That’s me"
+        style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid #c4a35a;font:inherit" />
+      <p class="why" id="writeWarn" style="display:none">Try another name.</p>
     </div>
+    <button class="btn primary" onclick="saveWriteIn()">Use that</button>
     <button class="btn ghost" onclick="go('home')">Both games</button>
   `;
 }
-function escapeAttr(s) {
-  return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+function pickRole(id) { state.role = id; go("lesson"); }
+function blockedName(s) {
+  const t = (s || "").toLowerCase();
+  const bad = ["fuck","shit","bitch","asshole","cunt","nigger","nigga","faggot","retard","rape","porn","pussy","dick","cock","slut","whore"];
+  return bad.some((w) => t.includes(w));
 }
-function showWriteIn() {
-  state.role = "writein";
-  const input = document.getElementById("writein-input");
-  if (input) input.focus();
-}
-function pickRole(id) {
-  state.role = id;
-  if (id !== "writein") state.customName = "";
-  persistSeat();
-  go("lesson");
-}
-function confirmWriteIn() {
-  const input = document.getElementById("writein-input");
-  const box = document.getElementById("writein-box");
-  const err = document.getElementById("writein-err");
-  const cleaned = cleanWriteIn(input ? input.value : "");
-  if (input) input.value = cleaned;
-  if (!writeInAllowed(cleaned)) {
-    if (err) err.textContent = "Try another name.";
-    if (box) {
-      box.classList.remove("shake");
-      void box.offsetWidth;
-      box.classList.add("shake");
-    }
+function saveWriteIn() {
+  const el = document.getElementById("writein");
+  const raw = (el && el.value || "").trim().replace(/[^a-zA-Z0-9 '\-]/g, "");
+  const warn = document.getElementById("writeWarn");
+  if (!raw || blockedName(raw)) {
+    if (warn) warn.style.display = "block";
     return;
   }
-  if (err) err.textContent = "";
+  ROLES.writein.title = raw.slice(0, 24);
+  ROLES.writein.line = "Hold it, " + ROLES.writein.title + ".";
   state.role = "writein";
-  state.customName = cleaned;
-  persistSeat();
   go("lesson");
 }
 
@@ -476,13 +386,14 @@ function lesson() {
   const L = LESSONS[state.lesson];
   const pct = Math.round((state.lesson / LESSONS.length) * 100);
   return `
-    <p class="hint">${playerName()} · Step Right Up</p>
+    <p class="hint">${ROLES[state.role].title} · Step Right Up</p>
     <div class="meter"><i style="width:${pct}%"></i></div>
     <div class="lesson">
       <div class="tag">${L.tag}</div>
       <h3>${L.title}</h3>
       <p>${L.body}</p>
       <ul>${L.bullets.map(b => `<li>${b}</li>`).join("")}</ul>
+      ${L.href ? `<p style="margin-top:10px"><a href="${L.href}" target="_blank" rel="noopener">${L.hrefLabel}</a></p>` : ""}
     </div>
     <button class="btn primary" onclick="nextLesson()">${state.lesson === LESSONS.length - 1 ? "Quiz me" : "Got it"}</button>
     <button class="btn ghost" onclick="go('home')">Both games</button>
@@ -541,53 +452,27 @@ function paintBadge() {
   if (!c) return;
   const ctx = c.getContext("2d");
   const w = c.width, h = c.height;
-  const finish = () => {
-    ctx.strokeStyle = "#c4a35a";
-    ctx.lineWidth = 10;
-    ctx.beginPath(); ctx.arc(w/2, h/2, 122, 0, Math.PI*2); ctx.stroke();
-    ctx.strokeStyle = "#e3c77a";
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(w/2, h/2, 108, 0, Math.PI*2); ctx.stroke();
-    ctx.fillStyle = "#c4a35a";
-    ctx.font = "700 18px Fraunces, Georgia, serif";
-    ctx.textAlign = "center";
-    ctx.fillText("STEP RIGHT UP", w/2, 78);
-    ctx.fillStyle = "#f6efe2";
-    ctx.font = "700 34px Fraunces, Georgia, serif";
-    ctx.fillText(ROLES[state.role].badge, w/2, 118);
-    ctx.fillStyle = "#e3c77a";
-    ctx.font = "15px Source Sans 3, sans-serif";
-    ctx.fillText(state.score + " / " + QUIZ.length + " · " + playerName(), w/2, 148);
-    ctx.fillStyle = "#c4a35a";
-    ctx.font = "12px Source Sans 3, sans-serif";
-    ctx.fillText("CRITTERS ON CALL · CALLAHAN / JAX", w/2, 228);
-  };
   ctx.fillStyle = "#1b3026";
   ctx.fillRect(0, 0, w, h);
-  const img = new Image();
-  img.onload = () => {
-    ctx.save();
-    ctx.beginPath(); ctx.arc(w/2, h/2, 100, 0, Math.PI*2); ctx.clip();
-    const s = Math.min(img.width, img.height);
-    const sx = (img.width - s) / 2, sy = (img.height - s) / 2;
-    ctx.globalAlpha = 0.92;
-    ctx.drawImage(img, sx, sy, s, s, w/2 - 100, h/2 - 100, 200, 200);
-    ctx.restore();
-    // soft veil so text stays readable
-    ctx.fillStyle = "rgba(27,48,38,0.55)";
-    ctx.beginPath(); ctx.arc(w/2, h/2, 100, 0, Math.PI*2); ctx.fill();
-    finish();
-  };
-  img.onerror = finish;
-  img.src = MARK1;
-}
-function saveBadge() {
-  const c = document.getElementById("badge");
-  if (!c) return;
-  const a = document.createElement("a");
-  a.href = c.toDataURL("image/png");
-  a.download = "step-right-up-filed-it.png";
-  a.click();
+  ctx.strokeStyle = "#c4a35a";
+  ctx.lineWidth = 10;
+  ctx.beginPath(); ctx.arc(w/2, h/2, 122, 0, Math.PI*2); ctx.stroke();
+  ctx.strokeStyle = "#e3c77a";
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(w/2, h/2, 108, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle = "#c4a35a";
+  ctx.font = "700 18px Fraunces, Georgia, serif";
+  ctx.textAlign = "center";
+  ctx.fillText("STEP RIGHT UP", w/2, 92);
+  ctx.fillStyle = "#f6efe2";
+  ctx.font = "700 36px Fraunces, Georgia, serif";
+  ctx.fillText(ROLES[state.role].badge, w/2, 138);
+  ctx.fillStyle = "#e3c77a";
+  ctx.font = "16px Source Sans 3, sans-serif";
+  ctx.fillText(state.score + " / " + QUIZ.length + " · " + ROLES[state.role].title, w/2, 168);
+  ctx.fillStyle = "#c4a35a";
+  ctx.font = "12px Source Sans 3, sans-serif";
+  ctx.fillText("CRITTERS ON CALL", w/2, 202);
 }
 
 function wings() {
@@ -601,21 +486,20 @@ function wings() {
       <p>${passed
         ? "That image is the wings. It means you can file without guessing."
         : "You had " + state.score + " right. Five opens the gate."}</p>
-      ${passed ? '<button class="btn primary" type="button" onclick="saveBadge()">Save badge</button>' : ""}
     </div>
     <div class="check">
       <b>Real level — do this on the official site</b>
       <ol>
-        <li>Open stepupforstudents.org</li>
-        <li>Create the parent account / EMA</li>
+        <li><a href="${OFFICIAL}" target="_blank" rel="noopener">Open stepupforstudents.org</a></li>
+        <li><a href="${APPLY}" target="_blank" rel="noopener">Apply / create the EMA account</a></li>
         <li>Add the child</li>
         <li>Two residency docs, two different types</li>
-        <li>If PEP: April 30 on the calendar</li>
+        <li>If PEP: April 30 — <a href="${DATES}" target="_blank" rel="noopener">dates</a></li>
         <li>Accept if awarded</li>
       </ol>
     </div>
-    <a class="btn primary" style="display:block;text-decoration:none" href="${OFFICIAL}" target="_blank" rel="noopener">Official apply</a>
-    <button class="btn ghost" onclick="go('watch')">Play Your Week</button>
+    <a class="btn primary" style="display:block;text-decoration:none" href="${APPLY}" target="_blank" rel="noopener">Apply on Step Up — live</a>
+    <button class="btn ghost" onclick="go('watch')">Juggle the week</button>
     <button class="btn ghost" onclick="startStep()">Replay</button>
     <p class="tiny">2025–26 counts from Step Up fact sheets. Trust the portal when numbers move.</p>
   `;
@@ -623,12 +507,12 @@ function wings() {
 
 function watchScreen() {
   setTimeout(bootWatch, 30);
-  const who = playerName();
   return `
+    <img class="mark small" src="${MARK2}" alt="" />
     <p class="hint">Module 2 · Your Week</p>
-    <h2>Hold it, ${who}.</h2>
-    <p class="lead">The list that is already on her phone. Tap each to-do before five drop.</p>
-    <div class="hud"><span>Cleared <b id="held">0</b></span><span>Dropped <b id="dropped">0</b>/5</span></div>
+    <h2>Juggling it.</h2>
+    <p class="lead">Recital. Soccer. The mortgage. Tap the ball before it drops.</p>
+    <div class="hud"><span>Held <b id="held">0</b></span><span>Dropped <b id="dropped">0</b>/5</span></div>
     <canvas id="watch" width="400" height="440"></canvas>
     <div class="toast" id="toast">Tap what falls.</div>
     <button class="btn ghost" onclick="stopWatch(); go('home')">Both games</button>
@@ -649,13 +533,14 @@ function bootWatch() {
   state.watch = { raf: 0 };
 
   function spawn() {
-    const [label, praise] = ROCKS[Math.floor(Math.random() * ROCKS.length)];
+    const item = ROCKS[Math.floor(Math.random() * ROCKS.length)];
     rocks.push({
-      x: 36 + Math.random() * (canvas.width - 72),
-      y: -24,
-      v: 1.15 + Math.random() * 1.35,
-      r: 30 + Math.random() * 8,
-      label, praise
+      x: 40 + Math.random() * (canvas.width - 80),
+      y: -28,
+      v: 1.05 + Math.random() * 1.55,
+      r: 34 + Math.random() * 8,
+      wobble: Math.random() * Math.PI * 2,
+      ...item
     });
   }
 
@@ -666,7 +551,8 @@ function bootWatch() {
     if (over) { stopWatch(); bootWatch(); return; }
     for (let i = rocks.length - 1; i >= 0; i--) {
       const r = rocks[i];
-      const dx = x - r.x, dy = y - r.y;
+      const wx = r.x + Math.sin(r.wobble || 0) * 7;
+      const dx = x - wx, dy = y - r.y;
       if (dx * dx + dy * dy <= r.r * r.r) {
         rocks.splice(i, 1);
         held++;
@@ -682,27 +568,40 @@ function bootWatch() {
 
   function tick(t) {
     const dt = Math.min(40, t - last); last = t; acc += dt;
-    if (!over && acc > 820) { acc = 0; spawn(); }
-    ctx.fillStyle = "#102018";
+    if (!over && acc > 780) { acc = 0; spawn(); }
+    ctx.fillStyle = "#1a2e24";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "rgba(196,163,90,.28)";
+    ctx.strokeStyle = "rgba(227,199,122,.35)";
     ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
-    ctx.fillStyle = "rgba(196,163,90,.38)";
+    ctx.fillStyle = "rgba(196,163,90,.45)";
     ctx.font = "10px Source Sans 3, sans-serif";
     ctx.textAlign = "left";
     ctx.fillText("CRITTERS ON CALL", 16, canvas.height - 14);
 
     for (let i = rocks.length - 1; i >= 0; i--) {
       const rock = rocks[i];
+      rock.wobble += dt / 220;
       rock.y += rock.v * (dt / 16);
+      const x = rock.x + Math.sin(rock.wobble) * 7;
+      const grd = ctx.createRadialGradient(x - rock.r * 0.35, rock.y - rock.r * 0.4, 4, x, rock.y, rock.r);
+      grd.addColorStop(0, "#fff6d8");
+      grd.addColorStop(0.28, rock.color);
+      grd.addColorStop(1, rock.color);
       ctx.beginPath();
-      ctx.arc(rock.x, rock.y, rock.r, 0, Math.PI * 2);
-      ctx.fillStyle = "#c4a35a";
+      ctx.arc(x, rock.y, rock.r, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
       ctx.fill();
-      ctx.fillStyle = "#1c140c";
-      ctx.font = "600 11px Source Sans 3, sans-serif";
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "rgba(28,20,12,.28)";
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x - rock.r * 0.32, rock.y - rock.r * 0.38, rock.r * 0.22, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,.55)";
+      ctx.fill();
+      ctx.fillStyle = rock.ink;
+      ctx.font = "700 11px Source Sans 3, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(rock.label, rock.x, rock.y + 4);
+      ctx.fillText(rock.label, x, rock.y + 4);
       if (rock.y - rock.r > canvas.height) {
         rocks.splice(i, 1);
         dropped++;
@@ -718,10 +617,10 @@ function bootWatch() {
       ctx.fillStyle = "#e3c77a";
       ctx.textAlign = "center";
       ctx.font = "700 28px Fraunces, Georgia, serif";
-      ctx.fillText("Week ended", canvas.width / 2, 190);
+      ctx.fillText("Week paused", canvas.width / 2, 190);
       ctx.fillStyle = "#f6efe2";
       ctx.font = "16px Source Sans 3, sans-serif";
-      ctx.fillText(held + " cleared. Tap to hold it again.", canvas.width / 2, 224);
+      ctx.fillText(held + " cleared. Tap to take the week again.", canvas.width / 2, 224);
       return;
     }
     state.watch.raf = requestAnimationFrame(tick);
