@@ -100,6 +100,7 @@
     #watch { width: 100%; height: 440px; background: #0f1812; border-radius: 16px; display: block; touch-action: manipulation; }
     .hud { display: flex; justify-content: space-between; font-size: 13px; color: var(--gold-2); margin: 8px 0; }
     .toast { min-height: 44px; font-size: 14px; color: #f6efe2; text-align: center; margin-top: 8px; }
+    .why { margin-top: 8px; font-size: 14px; color: #5a4a2e; }
   </style>
 </head>
 <body>
@@ -116,11 +117,15 @@ const OFFICIAL = "https://www.stepupforstudents.org/";
 const APPLY = "https://www.stepupforstudents.org/scholarships/private-school/apply/";
 const PEP = "https://www.stepupforstudents.org/handbook-web/pep-family-handbook/";
 const DATES = "https://www.stepupforstudents.org/faq/faqs-for-2026-27-scholarship-deadlines-and-payment-schedules/";
+const VPK_PORTAL = "https://familyservices.floridaearlylearning.com/";
+const VPK_DUVAL = "https://www.elcduval.org/i-am-a-parent/voluntary-prekindergarten-vpk/";
+const PPEC_AHCA = "https://ahca.myflorida.com/medicaid/child-health-services/prescribed-pediatric-extended-care-ppec.html";
 const MARK1 = "step-right-up-mark.jpg";
 const MARK2 = "the-watch-mark.jpg";
 
 const state = {
   screen: "home",
+  module: "step",
   role: "mom",
   lesson: 0,
   q: 0,
@@ -132,17 +137,15 @@ const state = {
 };
 
 const ROLES = {
-  mom: { title: "Mom", badge: "Filed It", line: "You know enough to open the portal." },
-  dad: { title: "Dad", badge: "Filed It", line: "You sat down and learned the door." },
-  grandma: { title: "Grandma", badge: "Filed It", line: "You turned a form into options." },
-  auntie: { title: "Auntie", badge: "Filed It", line: "You did the grown-up tab." },
-  friends: { title: "Friends", badge: "Filed It", line: "Y’all actually opened the laptop." },
-  vpk: { title: "VPK", badge: "Filed It", line: "You checked the scholarship door for that little one." },
-  ppec: { title: "PPEC", badge: "Filed It", line: "You looked up what the kid’s program can use." },
-  writein: { title: "That’s me", badge: "Filed It", line: "You wrote yourself in. That counts." }
+  mom: { title: "Mom", line: "You know enough to open the portal." },
+  dad: { title: "Dad", line: "You sat down and learned the door." },
+  grandma: { title: "Grandma", line: "You turned a form into options." },
+  auntie: { title: "Auntie", line: "You did the grown-up tab." },
+  friends: { title: "Friends", line: "Y’all actually opened the laptop." },
+  writein: { title: "That’s me", line: "You wrote yourself in. That counts." }
 };
 
-const LESSONS = [
+const STEP_LESSONS = [
   {
     tag: "1 of 7 · What it is",
     title: "Step Up is the booth — not the school.",
@@ -220,7 +223,7 @@ const LESSONS = [
   }
 ];
 
-const QUIZ = [
+const STEP_QUIZ = [
   {
     q: "Step Up For Students is…",
     opts: [
@@ -279,6 +282,297 @@ const QUIZ = [
   }
 ];
 
+const VPK_LESSONS = [
+  {
+    tag: "1 of 5 · What it is",
+    title: "VPK is Florida’s free pre-K — for real.",
+    body: "Voluntary Prekindergarten is the state’s FREE program for eligible 4-year-olds. Not a private voucher scam. Not a Facebook “deal.” It’s run through Early Learning and the Family Portal.",
+    bullets: [
+      "State program. Free VPK hours when your kid qualifies.",
+      "Private center or public school — you pick after you have the certificate.",
+      "School-year or summer options exist depending on the provider."
+    ],
+    href: VPK_PORTAL, hrefLabel: "Family Portal — live"
+  },
+  {
+    tag: "2 of 5 · Who’s in",
+    title: "Florida resident. Four by Sept 1.",
+    body: "Your child needs to live in Florida and turn 4 on or before September 1 of the program year. That’s the age gate.",
+    bullets: [
+      "For 2026–27: birthday roughly Sept 2, 2021 through Sept 1, 2022.",
+      "Kids born Feb 2–Sept 1 can often wait a year if that fits your family.",
+      "VPK itself is not income-based. School Readiness is a different program."
+    ],
+    href: VPK_DUVAL, hrefLabel: "ELC Duval VPK — live"
+  },
+  {
+    tag: "3 of 5 · The moves",
+    title: "Portal → papers → certificate → provider.",
+    body: "Learn the dance here. Do the real thing once on the Family Portal.",
+    bullets: [
+      "Make a Family Portal account.",
+      "Start the VPK application.",
+      "Upload ONE age proof and ONE Florida residency proof.",
+      "Wait for the approval email.",
+      "Print the Certificate of Eligibility and take it to the provider you choose."
+    ],
+    href: VPK_PORTAL, hrefLabel: "Apply on Family Portal — live"
+  },
+  {
+    tag: "4 of 5 · Money talk",
+    title: "They can’t charge you just to use VPK hours.",
+    body: "Providers can’t make you pay a registration fee just to use the free VPK hours. Wraparound care before/after those hours can still cost extra — that’s separate.",
+    bullets: [
+      "Free VPK hours ≠ free all-day care unless the provider says so.",
+      "Ask what’s included before you enroll.",
+      "Bring the certificate. That’s what opens the door."
+    ]
+  },
+  {
+    tag: "5 of 5 · Special needs",
+    title: "There’s a specialized path if you need it.",
+    body: "If your child needs more support, Florida has a VPK Specialized Instructional Services (VPK-SIS) option. This tool doesn’t decide that for you — the portal and your Early Learning Coalition do.",
+    bullets: [
+      "Ask about VPK-SIS on the Family Portal or with ELC Duval.",
+      "Still start with the official application path.",
+      "This is a confidence tool — not legal advice, not an enrollment promise."
+    ],
+    href: VPK_DUVAL, hrefLabel: "ELC Duval parent page — live"
+  }
+];
+
+const VPK_QUIZ = [
+  {
+    q: "VPK is…",
+    opts: [
+      { t: "A private voucher you buy online", ok: false, why: "Nope. It’s Florida’s free Voluntary Prekindergarten through Early Learning." },
+      { t: "Florida’s FREE Voluntary Prekindergarten for eligible 4-year-olds", ok: true, why: "State program. Family Portal. Real thing." },
+      { t: "The same thing as Step Up PEP", ok: false, why: "Different door. Different portal. Different age." }
+    ]
+  },
+  {
+    q: "For VPK itself, is income the gate?",
+    opts: [
+      { t: "Yes — low-income only", ok: false, why: "That’s closer to School Readiness. VPK itself isn’t income-based." },
+      { t: "No — residency and the age cutoff matter", ok: true, why: "Florida resident + turns 4 on/before Sept 1 of the program year." },
+      { t: "Only if you live in Duval", ok: false, why: "Duval has local help pages. The program is statewide." }
+    ]
+  },
+  {
+    q: "After approval, what do you take to the provider?",
+    opts: [
+      { t: "A screenshot of a Facebook post", ok: false, why: "Providers need the Certificate of Eligibility." },
+      { t: "The Certificate of Eligibility", ok: true, why: "Print it. Bring it. That’s the ticket." },
+      { t: "Your Step Up EMA award letter", ok: false, why: "Wrong program. VPK uses Early Learning’s Family Portal." }
+    ]
+  },
+  {
+    q: "How many age and residency proofs does the portal usually want?",
+    opts: [
+      { t: "ONE age proof and ONE Florida residency proof", ok: true, why: "Keep them clear and current. Blurry uploads slow you down." },
+      { t: "Ten tax returns", ok: false, why: "VPK isn’t asking for a tax vault just to apply." },
+      { t: "Nothing — just show up", ok: false, why: "Portal first. Papers second. Then the certificate." }
+    ]
+  },
+  {
+    q: "Can a provider charge a registration fee just to use free VPK hours?",
+    opts: [
+      { t: "Yes, always", ok: false, why: "They can’t make you pay a registration fee just to use VPK hours." },
+      { t: "No — though wraparound care can cost extra", ok: true, why: "Free hours are free. Extra hours before/after can be billed." },
+      { t: "Only in summer", ok: false, why: "The rule isn’t a season trick. Ask what’s included." }
+    ]
+  },
+  {
+    q: "Where do you actually apply?",
+    opts: [
+      { t: "A random Instagram link", ok: false, why: "Use the official Family Portal only." },
+      { t: "Family Portal (familyservices.floridaearlylearning.com)", ok: true, why: "That’s the live apply door." },
+      { t: "Step Up For Students EMA", ok: false, why: "EMA is scholarships. VPK is Early Learning." }
+    ]
+  }
+];
+
+const PPEC_LESSONS = [
+  {
+    tag: "1 of 5 · What it is",
+    title: "PPEC is medical daycare — not regular daycare.",
+    body: "Prescribed Pediatric Extended Care is skilled nursing and therapies in a non-residential center for Medicaid-eligible kids with medically complex or fragile needs. When authorized, it can run up to about 12 hours a day.",
+    bullets: [
+      "Medical daycare with nursing / therapies.",
+      "Not overnight residential care.",
+      "Authorization and medical need drive the hours."
+    ],
+    href: PPEC_AHCA, hrefLabel: "AHCA PPEC page — live"
+  },
+  {
+    tag: "2 of 5 · What it is not",
+    title: "Not VPK. Not Step Up. Not regular daycare.",
+    body: "Parents mix these up because every program has a portal and a waiting room. PPEC is a Medicaid medical benefit path — different door entirely.",
+    bullets: [
+      "VPK = free pre-K for eligible 4-year-olds.",
+      "Step Up = Florida choice scholarships.",
+      "PPEC = prescribed medical daycare for qualifying kids on Medicaid."
+    ]
+  },
+  {
+    tag: "3 of 5 · The path",
+    title: "Medicaid → doctor order → PPEC → authorization.",
+    body: "Typical path: child on Florida Medicaid, treating physician orders PPEC, a licensed PPEC assesses, Plan of Care gets built, prior authorization happens, then services can start.",
+    bullets: [
+      "Parent still owns the Medicaid and doctor conversation.",
+      "A PPEC can help with paperwork after there’s an order.",
+      "Nothing here enrolls your child — this is a confidence tool."
+    ],
+    href: PPEC_AHCA, hrefLabel: "Read AHCA’s PPEC overview — live"
+  },
+  {
+    tag: "4 of 5 · Age & need",
+    title: "Under 21 — when criteria are met.",
+    body: "Age is birth through age 20 (under 21) when medical criteria are met. The physician order and medical need matter more than a catchy brochure.",
+    bullets: [
+      "Medical complexity / fragility + physician order.",
+      "Licensed PPEC assessment and Plan of Care.",
+      "Prior authorization before you treat it like a done deal."
+    ]
+  },
+  {
+    tag: "5 of 5 · Your next soft step",
+    title: "Know the door. Then talk to the doctor.",
+    body: "This tool does not decide Medicaid eligibility or medical need. Soft next step: read AHCA’s page, talk to your child’s doctor, and ask a licensed PPEC about intake if your doctor is exploring the order.",
+    bullets: [
+      "Primary: AHCA’s official PPEC page.",
+      "Soft: doctor conversation + PPEC intake questions.",
+      "Hard disclaimer: not a medical or benefits determination."
+    ],
+    href: PPEC_AHCA, hrefLabel: "AHCA PPEC — live"
+  }
+];
+
+const PPEC_QUIZ = [
+  {
+    q: "PPEC stands for…",
+    opts: [
+      { t: "Private Preschool Enrollment Club", ok: false, why: "Not a club. It’s Prescribed Pediatric Extended Care." },
+      { t: "Prescribed Pediatric Extended Care", ok: true, why: "Medical daycare path for qualifying Medicaid kids." },
+      { t: "Parent Portal for Extra Credit", ok: false, why: "Cute, but no." }
+    ]
+  },
+  {
+    q: "PPEC is the same as VPK or Step Up.",
+    opts: [
+      { t: "True", ok: false, why: "Different doors. Don’t mash them together." },
+      { t: "False — it’s a medical daycare path, not free pre-K or a scholarship", ok: true, why: "Keep the programs separate in your head." },
+      { t: "True if you live in Duval", ok: false, why: "Geography doesn’t merge the programs." }
+    ]
+  },
+  {
+    q: "What’s a typical first medical step?",
+    opts: [
+      { t: "Skip the doctor and self-enroll online like daycare", ok: false, why: "Physician order and authorization matter." },
+      { t: "Treating physician orders PPEC for a Medicaid-eligible child", ok: true, why: "Then assessment, Plan of Care, prior auth." },
+      { t: "File a Step Up EMA app", ok: false, why: "Wrong portal for PPEC." }
+    ]
+  },
+  {
+    q: "Age-wise, PPEC can cover…",
+    opts: [
+      { t: "Only 4-year-olds", ok: false, why: "That’s the VPK age vibe, not PPEC." },
+      { t: "Under 21 — birth through age 20 when criteria are met", ok: true, why: "Medical need + order still gate the path." },
+      { t: "Adults only", ok: false, why: "This is a pediatric extended-care benefit." }
+    ]
+  },
+  {
+    q: "Who owns the Medicaid / doctor conversation?",
+    opts: [
+      { t: "The parent (a PPEC can help with paperwork after an order)", ok: true, why: "You still drive the medical and benefits talk." },
+      { t: "A Facebook admin", ok: false, why: "Please don’t." },
+      { t: "This quiz badge means you’re approved", ok: false, why: "Badge = you know the door. Not approval." }
+    ]
+  },
+  {
+    q: "Best official page to open first?",
+    opts: [
+      { t: "AHCA’s Prescribed Pediatric Extended Care page", ok: true, why: "Start with the state source, then talk to the doctor." },
+      { t: "A random “apply now” Google ad", ok: false, why: "Stick to AHCA and licensed providers." },
+      { t: "Family Portal VPK apply", ok: false, why: "That’s VPK. Wrong door for PPEC." }
+    ]
+  }
+];
+
+const MODULES = {
+  step: {
+    id: "step",
+    title: "Step Right Up",
+    badge: "Filed It",
+    badgeTitle: "STEP RIGHT UP",
+    passAt: 5,
+    lessons: STEP_LESSONS,
+    quiz: STEP_QUIZ,
+    mark: MARK1,
+    passLine: (role) => ROLES[role].line,
+    passBlurb: "That’s your Filed It badge. Means you can open the portal without guessing.",
+    failBlurb: (score) => "You had " + score + " right. Five right and you’re in.",
+    checklistTitle: "Real level — do this on the official site",
+    checklist: () => `
+      <li><a href="${OFFICIAL}" target="_blank" rel="noopener">Open stepupforstudents.org</a></li>
+      <li><a href="${APPLY}" target="_blank" rel="noopener">Apply / create the EMA account</a></li>
+      <li>Add the child</li>
+      <li>Two residency docs, two different types</li>
+      <li>If PEP: April 30 — <a href="${DATES}" target="_blank" rel="noopener">dates</a></li>
+      <li>Accept if awarded</li>`,
+    ctaHref: APPLY,
+    ctaLabel: "Apply on Step Up — live",
+    tiny: "2025–26 counts from Step Up fact sheets. Trust the portal when numbers move."
+  },
+  vpk: {
+    id: "vpk",
+    title: "VPK",
+    badge: "Certificate ready",
+    badgeTitle: "VPK",
+    passAt: 4,
+    lessons: VPK_LESSONS,
+    quiz: VPK_QUIZ,
+    mark: MARK1,
+    passLine: () => "Certificate ready — you know enough to open the Family Portal.",
+    passBlurb: "You’re not enrolled yet. You’re ready to apply without guessing.",
+    failBlurb: (score) => "You had " + score + " right. Get four right and the badge unlocks.",
+    checklistTitle: "Real level — Family Portal",
+    checklist: () => `
+      <li><a href="${VPK_PORTAL}" target="_blank" rel="noopener">Open Family Portal (apply)</a></li>
+      <li>Create / sign in to your account</li>
+      <li>Start the VPK application</li>
+      <li>Upload one age proof + one Florida residency proof</li>
+      <li>Print the Certificate of Eligibility when approved</li>
+      <li><a href="${VPK_DUVAL}" target="_blank" rel="noopener">ELC Duval VPK info</a></li>`,
+    ctaHref: VPK_PORTAL,
+    ctaLabel: "Apply on Family Portal — live",
+    tiny: "Confidence tool — not enrollment and not legal advice. Trust Early Learning / the portal when details move."
+  },
+  ppec: {
+    id: "ppec",
+    title: "PPEC",
+    badge: "Know the Door",
+    badgeTitle: "PPEC",
+    passAt: 4,
+    lessons: PPEC_LESSONS,
+    quiz: PPEC_QUIZ,
+    mark: MARK2,
+    passLine: () => "You know the door — not “approved for PPEC.”",
+    passBlurb: "Badge means you can talk to the doctor without guessing the name of the program.",
+    failBlurb: (score) => "You had " + score + " right. Four right unlocks the badge.",
+    checklistTitle: "Real level — careful next steps",
+    checklist: () => `
+      <li><a href="${PPEC_AHCA}" target="_blank" rel="noopener">Read AHCA’s PPEC page</a></li>
+      <li>Confirm Florida Medicaid status with your plan / agency</li>
+      <li>Talk to your child’s treating physician about a PPEC order</li>
+      <li>Ask a licensed PPEC about intake after there’s an order</li>
+      <li>Expect assessment, Plan of Care, and prior authorization</li>`,
+    ctaHref: PPEC_AHCA,
+    ctaLabel: "AHCA PPEC page — live",
+    tiny: "Not a medical or benefits determination. AHCA, your doctor, and Medicaid decide — not this quiz."
+  }
+};
+
 const ROCKS = [
   { label: "Car payment", praise: "The car still exists. That is not nothing.", color: "#e07a3d", ink: "#1c140c" },
   { label: "Rent", praise: "Roof stayed over their heads.", color: "#c4a35a", ink: "#1c140c" },
@@ -304,20 +598,24 @@ const ROCKS = [
 
 const $ = (id) => document.getElementById(id);
 const app = () => $("app");
+function mod() { return MODULES[state.module] || MODULES.step; }
 function save() {
   localStorage.setItem("sru-wings", state.wings);
   const el = $("wings");
   if (el) el.textContent = state.wings;
 }
-function go(name) { state.screen = name; render(); }
+function go(name) {
+  if (name === "vpk" || name === "ppec") { startModule(name); return; }
+  state.screen = name; render();
+}
 
 function home() {
   return `
     <p class="hint">Critters on Call · Florida</p>
     <h1>Step Right Up.</h1>
-    <p class="lead">Two little games. First you get the scholarship straight enough to file. Then you knock out the list already on your phone.</p>
+    <p class="lead">Four doors. Step Up scholarship. Your Week juggle. VPK free pre-K. PPEC medical daycare path. Pick one and learn it without the scare.</p>
     <div class="grid">
-      <button class="card-btn game-card" onclick="startStep()">
+      <button class="card-btn game-card" onclick="startModule('step')">
         <img src="${MARK1}" alt="" />
         <div>
           <b>Step Right Up</b>
@@ -331,23 +629,40 @@ function home() {
           <span>Juggling it — colored balls. Recital, soccer, the mortgage.</span>
         </div>
       </button>
+      <button class="card-btn game-card" onclick="startModule('vpk')">
+        <img src="${MARK1}" alt="" />
+        <div>
+          <b>VPK</b>
+          <span>Free Florida pre-K for 4-year-olds — lessons, quiz, badge, apply links.</span>
+        </div>
+      </button>
+      <button class="card-btn game-card" onclick="startModule('ppec')">
+        <img src="${MARK2}" alt="" />
+        <div>
+          <b>PPEC</b>
+          <span>Medical daycare path — lessons, quiz, badge, AHCA links.</span>
+        </div>
+      </button>
     </div>
-    <p class="tiny">This is a confidence tool — not the real application, not legal advice. Rules and money live at Step Up. We just make the first door less scary.</p>
+    <p class="tiny">Confidence tools — not the real application, not legal advice, not a medical or benefits determination. Official sites decide. We just make the first door less scary.</p>
   `;
 }
 
-function startStep() {
+function startModule(id) {
+  state.module = id;
   state.lesson = 0; state.q = 0; state.score = 0; state.locked = false; state.why = "";
   go("role");
 }
+function startStep() { startModule("step"); }
 
 function role() {
-  const presets = ["mom", "dad", "grandma", "auntie", "friends", "vpk", "ppec"];
+  const presets = ["mom", "dad", "grandma", "auntie", "friends"];
+  const m = mod();
   return `
-    <img class="mark small" src="${MARK1}" alt="" />
-    <p class="hint">Who is playing</p>
+    <img class="mark small" src="${m.mark}" alt="" />
+    <p class="hint">Who is playing · ${m.title}</p>
     <h2>Who is filing</h2>
-    <p class="lead">Mom first. Or Friends, VPK, PPEC — whoever’s on the laptop.</p>
+    <p class="lead">Mom, Dad, Grandma, Auntie, Friends — or write it in.</p>
     <div class="grid">
       ${presets.map((id) => `
         <button class="card-btn" onclick="pickRole('${id}')"><b>${ROLES[id].title}</b></button>
@@ -355,13 +670,13 @@ function role() {
     </div>
     <div class="lesson" style="margin-top:10px">
       <div class="tag">Write it in</div>
-      <p>Nana. Coach. Friends. VPK. PPEC. Whoever’s actually doing the portal.</p>
+      <p>Nana. Coach. Whoever’s actually on the laptop.</p>
       <input id="writein" maxlength="24" placeholder="That’s me"
         style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid #c4a35a;font:inherit" />
       <p class="why" id="writeWarn" style="display:none">Try another name.</p>
     </div>
     <button class="btn primary" onclick="saveWriteIn()">Use that</button>
-    <button class="btn ghost" onclick="go('home')">Both games</button>
+    <button class="btn ghost" onclick="go('home')">All games</button>
   `;
 }
 function pickRole(id) { state.role = id; go("lesson"); }
@@ -372,7 +687,7 @@ function blockedName(s) {
 }
 function saveWriteIn() {
   const el = document.getElementById("writein");
-  const raw = (el && el.value || "").trim().replace(/[^a-zA-Z0-9 '\-]/g, "");
+  const raw = (el && el.value || "").trim().replace(/[^a-zA-Z0-9 '\\-]/g, "");
   const warn = document.getElementById("writeWarn");
   if (!raw || blockedName(raw)) {
     if (warn) warn.style.display = "block";
@@ -385,10 +700,11 @@ function saveWriteIn() {
 }
 
 function lesson() {
-  const L = LESSONS[state.lesson];
-  const pct = Math.round((state.lesson / LESSONS.length) * 100);
+  const m = mod();
+  const L = m.lessons[state.lesson];
+  const pct = Math.round((state.lesson / m.lessons.length) * 100);
   return `
-    <p class="hint">${ROLES[state.role].title} · Step Right Up</p>
+    <p class="hint">${ROLES[state.role].title} · ${m.title}</p>
     <div class="meter"><i style="width:${pct}%"></i></div>
     <div class="lesson">
       <div class="tag">${L.tag}</div>
@@ -397,20 +713,22 @@ function lesson() {
       <ul>${L.bullets.map(b => `<li>${b}</li>`).join("")}</ul>
       ${L.href ? `<p style="margin-top:10px"><a href="${L.href}" target="_blank" rel="noopener">${L.hrefLabel}</a></p>` : ""}
     </div>
-    <button class="btn primary" onclick="nextLesson()">${state.lesson === LESSONS.length - 1 ? "Quiz me" : "Got it"}</button>
-    <button class="btn ghost" onclick="go('home')">Both games</button>
+    <button class="btn primary" onclick="nextLesson()">${state.lesson === m.lessons.length - 1 ? "Quiz me" : "Got it"}</button>
+    <button class="btn ghost" onclick="go('home')">All games</button>
   `;
 }
 function nextLesson() {
-  if (state.lesson < LESSONS.length - 1) { state.lesson++; go("lesson"); }
+  const m = mod();
+  if (state.lesson < m.lessons.length - 1) { state.lesson++; go("lesson"); }
   else go("quiz");
 }
 
 function quiz() {
-  const Q = QUIZ[state.q];
-  const pct = Math.round((state.q / QUIZ.length) * 100);
+  const m = mod();
+  const Q = m.quiz[state.q];
+  const pct = Math.round((state.q / m.quiz.length) * 100);
   return `
-    <p class="hint">Question ${state.q + 1} / ${QUIZ.length} · ${state.score} right</p>
+    <p class="hint">Question ${state.q + 1} / ${m.quiz.length} · ${state.score} right</p>
     <div class="meter"><i style="width:${pct}%"></i></div>
     <div class="lesson">
       <h3>${Q.q}</h3>
@@ -425,7 +743,8 @@ function quiz() {
 function answer(i) {
   if (state.locked) return;
   state.locked = true;
-  const Q = QUIZ[state.q];
+  const m = mod();
+  const Q = m.quiz[state.q];
   const buttons = [...document.querySelectorAll(".choice")];
   buttons.forEach((b, idx) => {
     if (Q.opts[idx].ok) b.classList.add("good");
@@ -444,7 +763,7 @@ function answer(i) {
     state.locked = false;
     state.why = "";
     state.q++;
-    if (state.q >= QUIZ.length) go("wings");
+    if (state.q >= m.quiz.length) go("wings");
     else go("quiz");
   }, 850);
 }
@@ -452,6 +771,7 @@ function answer(i) {
 function paintBadge() {
   const c = document.getElementById("badge");
   if (!c) return;
+  const m = mod();
   const ctx = c.getContext("2d");
   const w = c.width, h = c.height;
   ctx.fillStyle = "#1b3026";
@@ -465,45 +785,39 @@ function paintBadge() {
   ctx.fillStyle = "#c4a35a";
   ctx.font = "700 18px Fraunces, Georgia, serif";
   ctx.textAlign = "center";
-  ctx.fillText("STEP RIGHT UP", w/2, 92);
+  ctx.fillText(m.badgeTitle, w/2, 92);
   ctx.fillStyle = "#f6efe2";
-  ctx.font = "700 36px Fraunces, Georgia, serif";
-  ctx.fillText(ROLES[state.role].badge, w/2, 138);
+  ctx.font = "700 28px Fraunces, Georgia, serif";
+  ctx.fillText(m.badge, w/2, 138);
   ctx.fillStyle = "#e3c77a";
   ctx.font = "16px Source Sans 3, sans-serif";
-  ctx.fillText(state.score + " / " + QUIZ.length + " · " + ROLES[state.role].title, w/2, 168);
+  ctx.fillText(state.score + " / " + m.quiz.length + " · " + ROLES[state.role].title, w/2, 168);
   ctx.fillStyle = "#c4a35a";
   ctx.font = "12px Source Sans 3, sans-serif";
   ctx.fillText("CRITTERS ON CALL", w/2, 202);
 }
 
 function wings() {
-  const passed = state.score >= 5;
+  const m = mod();
+  const passed = state.score >= m.passAt;
   if (passed) { state.wings += 1; save(); }
   setTimeout(paintBadge, 20);
   return `
     <div class="badge">
       <canvas id="badge" width="280" height="280"></canvas>
-      <h2>${passed ? ROLES[state.role].line : "Close. Run it once more."}</h2>
-      <p>${passed
-        ? "That’s your Filed It badge. Means you can open the portal without guessing."
-        : "You had " + state.score + " right. Five right and you’re in."}</p>
+      <h2>${passed ? m.passLine(state.role) : "Close. Run it once more."}</h2>
+      <p>${passed ? m.passBlurb : m.failBlurb(state.score)}</p>
     </div>
     <div class="check">
-      <b>Real level — do this on the official site</b>
-      <ol>
-        <li><a href="${OFFICIAL}" target="_blank" rel="noopener">Open stepupforstudents.org</a></li>
-        <li><a href="${APPLY}" target="_blank" rel="noopener">Apply / create the EMA account</a></li>
-        <li>Add the child</li>
-        <li>Two residency docs, two different types</li>
-        <li>If PEP: April 30 — <a href="${DATES}" target="_blank" rel="noopener">dates</a></li>
-        <li>Accept if awarded</li>
-      </ol>
+      <b>${m.checklistTitle}</b>
+      <ol>${m.checklist()}</ol>
     </div>
-    <a class="btn primary" style="display:block;text-decoration:none" href="${APPLY}" target="_blank" rel="noopener">Apply on Step Up — live</a>
+    <a class="btn primary" style="display:block;text-decoration:none" href="${m.ctaHref}" target="_blank" rel="noopener">${m.ctaLabel}</a>
+    ${m.id === "ppec" ? `<button class="btn ghost" onclick="window.open('${PPEC_AHCA}','_blank','noopener')">Talk next: doctor / PPEC intake</button>` : ""}
     <button class="btn ghost" onclick="go('watch')">Juggle the week</button>
-    <button class="btn ghost" onclick="startStep()">Replay</button>
-    <p class="tiny">2025–26 counts from Step Up fact sheets. Trust the portal when numbers move.</p>
+    <button class="btn ghost" onclick="startModule('${m.id}')">Replay</button>
+    <button class="btn ghost" onclick="go('home')">All games</button>
+    <p class="tiny">${m.tiny}</p>
   `;
 }
 
@@ -517,7 +831,7 @@ function watchScreen() {
     <div class="hud"><span>Held <b id="held">0</b></span><span>Dropped <b id="dropped">0</b>/5</span></div>
     <canvas id="watch" width="400" height="440"></canvas>
     <div class="toast" id="toast">Tap what falls.</div>
-    <button class="btn ghost" onclick="stopWatch(); go('home')">Both games</button>
+    <button class="btn ghost" onclick="stopWatch(); go('home')">All games</button>
   `;
 }
 
