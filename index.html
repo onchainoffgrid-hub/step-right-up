@@ -101,6 +101,24 @@
     .hud { display: flex; justify-content: space-between; font-size: 13px; color: var(--gold-2); margin: 8px 0; }
     .toast { min-height: 44px; font-size: 14px; color: #f6efe2; text-align: center; margin-top: 8px; }
     .why { margin-top: 8px; font-size: 14px; color: #5a4a2e; }
+
+    .tier {
+      font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+      font-weight: 700; color: var(--gold); margin: 16px 0 8px;
+    }
+    .tier:first-of-type { margin-top: 4px; }
+    .res {
+      display: block; text-decoration: none; color: inherit;
+      background: rgba(255,250,241,.07); border: 1px solid rgba(196,163,90,.28);
+      border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
+    }
+    .res b { display: block; font-size: 15px; color: var(--gold-2); margin-bottom: 3px; }
+    .res span { font-size: 13px; color: #d7c9a8; line-height: 1.4; }
+    .pill {
+      display: inline-block; font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+      border: 1px solid rgba(196,163,90,.45); color: var(--gold); border-radius: 99px;
+      padding: 2px 8px; margin-bottom: 6px;
+    }
   </style>
 </head>
 <body>
@@ -120,6 +138,13 @@ const DATES = "https://www.stepupforstudents.org/faq/faqs-for-2026-27-scholarshi
 const VPK_PORTAL = "https://familyservices.floridaearlylearning.com/";
 const VPK_DUVAL = "https://www.elcduval.org/i-am-a-parent/voluntary-prekindergarten-vpk/";
 const PPEC_AHCA = "https://ahca.myflorida.com/medicaid/child-health-services/prescribed-pediatric-extended-care-ppec.html";
+
+const KIDCARE = "https://www.floridakidcare.org/";
+const ELC_DUVAL = "https://www.elcduval.org/";
+const CARES = "https://cares.myflfamilies.com/PublicSearch";
+const FL_211 = "https://www.nefl211.org/";
+const MEDICAID = "https://www.myflfamilies.com/services/public-assistance/medicaid";
+const WIC = "https://www.floridahealth.gov/programs-and-services/wic/";
 const MARK1 = "step-right-up-mark.jpg";
 const MARK2 = "the-watch-mark.jpg";
 
@@ -611,9 +636,9 @@ function go(name) {
 
 function home() {
   return `
-    <p class="hint">Critters on Call · Florida</p>
+    <p class="hint">Critters on Call · Callahan / Jax</p>
     <h1>Step Right Up.</h1>
-    <p class="lead">Four doors. Step Up scholarship. Your Week juggle. VPK free pre-K. PPEC medical daycare path. Pick one and learn it without the scare.</p>
+    <p class="lead">Games that make the real doors less scary — scholarships, free pre-K, medical daycare, and the week on your phone.</p>
     <div class="grid">
       <button class="card-btn game-card" onclick="startModule('step')">
         <img src="${MARK1}" alt="" />
@@ -642,6 +667,10 @@ function home() {
           <b>PPEC</b>
           <span>Medical daycare path — lessons, quiz, badge, AHCA links.</span>
         </div>
+      </button>
+      <button class="card-btn" onclick="go('doors')">
+        <b>More doors · S-tier</b>
+        <span style="display:block;font-size:13px;color:#d7c9a8;margin-top:4px">Organized for your people — Jax moms, VPK, PPEC, PEP, KidCare.</span>
       </button>
     </div>
     <p class="tiny">Confidence tools — not the real application, not legal advice, not a medical or benefits determination. Official sites decide. We just make the first door less scary.</p>
@@ -947,9 +976,49 @@ function bootWatch() {
   state.watch.raf = requestAnimationFrame(tick);
 }
 
+
+function doors() {
+  return `
+    <p class="hint">Callahan / Jacksonville · S-tier only</p>
+    <h2>More doors.</h2>
+    <p class="lead">Ranked for Critters families — the ones your people actually need, not a random statewide dump.</p>
+
+    <div class="tier">S · Homeschool / custom year (PEP)</div>
+    <a class="res" href="${OFFICIAL}" target="_blank" rel="noopener"><span class="pill">S</span><b>Step Up For Students</b><span>Scholarship portal (EMA). PEP, private school, UA. Start here if you’re filing money for the year.</span></a>
+    <a class="res" href="${APPLY}" target="_blank" rel="noopener"><span class="pill">S</span><b>Apply / EMA login</b><span>Live apply door. Create the parent account, add the kid, upload docs.</span></a>
+    <a class="res" href="${PEP}" target="_blank" rel="noopener"><span class="pill">S</span><b>PEP family handbook</b><span>What the ESA can buy, Student Learning Plan, renewals. Read before you spend.</span></a>
+    <a class="res" href="${DATES}" target="_blank" rel="noopener"><span class="pill">S</span><b>2026–27 dates FAQ</b><span>April 30 PEP trap. Private / UA windows. Don’t trust a Facebook admin for deadlines.</span></a>
+
+    <div class="tier">S · Almost-4 / VPK families</div>
+    <a class="res" href="${VPK_PORTAL}" target="_blank" rel="noopener"><span class="pill">S</span><b>Early Learning Family Portal</b><span>Official VPK + School Readiness apply. Certificate of eligibility lives here.</span></a>
+    <a class="res" href="${VPK_DUVAL}" target="_blank" rel="noopener"><span class="pill">S</span><b>ELC Duval — VPK</b><span>Local Jax help. Ages, docs, what to bring to the provider.</span></a>
+    <a class="res" href="${ELC_DUVAL}" target="_blank" rel="noopener"><span class="pill">S</span><b>Early Learning Coalition of Duval</b><span>Provider lists, School Readiness questions, real humans when the portal glitches.</span></a>
+
+    <div class="tier">S · Medically complex / PPEC</div>
+    <a class="res" href="${PPEC_AHCA}" target="_blank" rel="noopener"><span class="pill">S</span><b>AHCA — PPEC overview</b><span>What PPEC is (medical daycare), who it serves, official policy door.</span></a>
+    <a class="res" href="${MEDICAID}" target="_blank" rel="noopener"><span class="pill">S</span><b>Florida Medicaid (families)</b><span>PPEC rides on Medicaid. Get eligibility straight with DCF / your plan before chasing centers.</span></a>
+
+    <div class="tier">S · Health coverage for kids</div>
+    <a class="res" href="${KIDCARE}" target="_blank" rel="noopener"><span class="pill">S</span><b>Florida KidCare</b><span>Health insurance for kids. Same muscle as filing Step Up — open the form.</span></a>
+    <a class="res" href="${WIC}" target="_blank" rel="noopener"><span class="pill">A</span><b>Florida WIC</b><span>Nutrition help for pregnant moms and little ones. Strong overlap with your young-family crowd.</span></a>
+
+    <div class="tier">A · Check the place before you enroll</div>
+    <a class="res" href="${CARES}" target="_blank" rel="noopener"><span class="pill">A</span><b>DCF CARES child-care lookup</b><span>License / inspection look-up before you commit to a center or wraparound.</span></a>
+
+    <div class="tier">A · When you don’t know which door</div>
+    <a class="res" href="${FL_211}" target="_blank" rel="noopener"><span class="pill">A</span><b>211 Northeast Florida</b><span>One number / site when rent, food, or “where do I even start?” hits. Jax metro.</span></a>
+
+    <p class="tiny">S = open this week if it fits your kid. A = keep bookmarked. Not legal, medical, or benefits advice — official sites win.</p>
+    <button class="btn primary" onclick="startModule('step')">Play Step Right Up</button>
+    <button class="btn ghost" onclick="startModule('vpk')">Play VPK</button>
+    <button class="btn ghost" onclick="startModule('ppec')">Play PPEC</button>
+    <button class="btn ghost" onclick="go('home')">All games</button>
+  `;
+}
+
 function render() {
   save();
-  const map = { home, role, lesson, quiz, wings, watch: watchScreen };
+  const map = { home, role, lesson, quiz, wings, watch: watchScreen, doors };
   stopWatch();
   app().innerHTML = map[state.screen]();
 }
