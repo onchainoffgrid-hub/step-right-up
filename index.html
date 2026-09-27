@@ -136,84 +136,86 @@ const ROLES = {
   dad: { title: "Dad", badge: "Filed It", line: "You sat down and learned the door." },
   grandma: { title: "Grandma", badge: "Filed It", line: "You turned a form into options." },
   auntie: { title: "Auntie", badge: "Filed It", line: "You did the grown-up tab." },
-  friends: { title: "Two friends", badge: "Filed It", line: "You two actually opened the laptop." },
+  friends: { title: "Friends", badge: "Filed It", line: "Y’all actually opened the laptop." },
+  vpk: { title: "VPK", badge: "Filed It", line: "You checked the scholarship door for that little one." },
+  ppec: { title: "PPEC", badge: "Filed It", line: "You looked up what the kid’s program can use." },
   writein: { title: "That’s me", badge: "Filed It", line: "You wrote yourself in. That counts." }
 };
 
 const LESSONS = [
   {
     tag: "1 of 7 · What it is",
-    title: "Step Up is the booth. Not the school.",
-    body: "Step Up For Students is a Florida nonprofit that runs the scholarship portal (EMA), checks documents, and moves the money. You apply there. Not in a Facebook group. Not at a farm.",
-    bullets: ["They administer Florida’s choice scholarships.", "2025–26: they funded 520,000+ students.", "Use the real site. Ignore look-alikes."],
+    title: "Step Up is the booth — not the school.",
+    body: "Step Up For Students is the Florida nonprofit that runs the scholarship site (EMA). They check your papers and send the money. You apply on their site — not in a Facebook group, not at a farm.",
+    bullets: ["They run Florida’s choice scholarships.", "2025–26: they funded 520,000+ kids.", "Use the real site. Ignore look-alikes."],
     href: OFFICIAL, hrefLabel: "stepupforstudents.org — live"
   },
   {
     tag: "2 of 7 · Pick a door",
     title: "Homeschool year? That door is PEP.",
-    body: "One child, one scholarship path. Applying to two programs for the same kid at the same time is how files stall.",
+    body: "One kid, one door. Applying to two programs for the same kid at once is how files get stuck.",
     bullets: [
       "Home / custom / not full-time in a school → FTC-PEP.",
       "Private school full-time → FTC / FES-EO.",
-      "Documented unique ability or IEP → FES-UA (as early as age 3)."
+      "Documented unique ability or IEP → FES-UA (age 3+)."
     ],
     href: PEP, hrefLabel: "PEP handbook — live"
   },
   {
     tag: "3 of 7 · Who gets in line",
-    title: "Florida kid. That is the gate.",
-    body: "PEP and the private-school scholarships need a Florida resident (or an active-duty military dependent with PCS orders to Florida) who can enroll in K–12. Kindergarten: five on or before September 1.",
+    title: "Florida kid. That’s the gate.",
+    body: "Kid needs to be a Florida resident (or active-duty military with PCS orders to Florida) and able to do K–12. Kindergarten: five by Sept 1.",
     bullets: [
       "Income is priority, not a locked door. Lower income goes first.",
-      "Funding is not promised. Deadlines and capacity decide.",
-      "Full-time public-school funding and this scholarship do not stack."
+      "Money isn’t guaranteed. Deadlines and how many spots matter.",
+      "You can’t stack this with full-time public-school funding for the same kid."
     ]
   },
   {
     tag: "4 of 7 · You are not early",
-    title: "Jacksonville already does this.",
+    title: "Jax already does this.",
     body: "The weird feeling is the only thing you have to crush. The line is already long.",
     bullets: [
       "Private-school scholarships, 2025–26: about 286,000 students.",
-      "PEP accounts: about 79,000 funded statewide.",
+      "PEP: about 79,000 funded statewide.",
       "Duval County: about 3,700 PEP students.",
-      "Feb 2026 season open: 200,000 applications in three days."
+      "Feb 2026 open: 200,000 apps in three days."
     ]
   },
   {
     tag: "5 of 7 · The five moves",
     title: "This is the whole dance.",
-    body: "Learn it here. Do it once on the real site.",
+    body: "Learn it here. Do the real thing once on their site.",
     bullets: [
-      "Create the parent account and open EMA.",
-      "Add the student. One application per program.",
-      "Upload two different Florida residency proofs. Age proof for K/1. Military LES + PCS if that is you.",
-      "Submit, then kill blurry uploads when they nag.",
-      "Accept the award. Unaccepted money leaves."
+      "Make the parent account and open EMA.",
+      "Add your kid. One app per program.",
+      "Upload two different Florida residency proofs. Age proof for K/1. Military? LES + PCS.",
+      "Hit submit, then fix blurry uploads when they ask.",
+      "Accept the award. If you don’t accept, the money walks."
     ],
     href: APPLY, hrefLabel: "Apply in EMA — live"
   },
   {
     tag: "6 of 7 · The date trap",
     title: "PEP closes April 30.",
-    body: "Private-school new apps can run to November 15. New PEP apps do not. Homeschool families miss this every year and think they have fall.",
+    body: "Private-school new apps can run to Nov 15. New PEP does not. Homeschool folks miss this every year thinking they’ve got till fall.",
     bullets: [
       "2026–27 renewals: Feb 1–April 30.",
       "2026–27 new PEP: Feb 1–April 30.",
       "2026–27 new private school / UA: Feb 1–Nov 15.",
       "New private-school awards: accept by Dec 15.",
-      "Active-duty military can get deadline exceptions. Still upload the papers."
+      "Active-duty military can get deadline exceptions — still upload the papers."
     ],
     href: DATES, hrefLabel: "2026–27 dates — live"
   },
   {
     tag: "7 of 7 · What the money is",
-    title: "PEP buys the year. Not a vibe.",
-    body: "PEP is an education savings account for students not enrolled full-time in public or private school. Awards run roughly $7,700–$8,500 by grade and county.",
+    title: "PEP buys the year — not a vibe.",
+    body: "PEP is basically an education savings account if your kid isn’t full-time public or private. Awards run about $7,700–$8,500 depending on grade and county.",
     bullets: [
       "Curriculum, materials, testing, tutoring, part-time classes, approved programs.",
       "You file a Student Learning Plan. Renewals need last year’s scores in the portal.",
-      "A farm day only counts if that provider is approved for that expense. Check EMA. Do not assume."
+      "A farm day only counts if that provider is approved for that expense. Check EMA — don’t assume."
     ]
   }
 ];
@@ -222,15 +224,15 @@ const QUIZ = [
   {
     q: "Step Up For Students is…",
     opts: [
-      { t: "A private school in Jacksonville", ok: false, why: "They do not teach anyone. They run the money and the portal." },
-      { t: "The nonprofit that runs Florida’s scholarship portal", ok: true, why: "EMA lives on their site. That is the booth." },
-      { t: "A homeschool co-op", ok: false, why: "Co-ops are local. Step Up is statewide plumbing." }
+      { t: "A private school in Jacksonville", ok: false, why: "They don’t teach kids. They run the money and the portal." },
+      { t: "The nonprofit that runs Florida’s scholarship portal", ok: true, why: "EMA is on their site. That’s the real booth." },
+      { t: "A homeschool co-op", ok: false, why: "Co-ops are local. Step Up is the statewide plumbing." }
     ]
   },
   {
     q: "Custom / home year, not full-time in a school. Which door?",
     opts: [
-      { t: "FTC-PEP", ok: true, why: "PEP is the home-style account." },
+      { t: "FTC-PEP", ok: true, why: "PEP is the home / custom-year account." },
       { t: "Only FES-EO", ok: false, why: "FES-EO is the private-school door." },
       { t: "Hope Scholarship forever", ok: false, why: "Hope is a different, older path. Do not default to it." }
     ]
@@ -238,8 +240,8 @@ const QUIZ = [
   {
     q: "Do you have to be low-income to apply?",
     opts: [
-      { t: "Yes. No exceptions.", ok: false, why: "That used to be closer to true. It is not the rule now." },
-      { t: "No. Income changes priority, not the right to apply.", ok: true, why: "Lower income goes first. Everyone can get in line." },
+      { t: "Yes. No exceptions.", ok: false, why: "Used to feel that way. Not the rule now." },
+      { t: "No. Income changes priority, not the right to apply.", ok: true, why: "Lower income goes first. Everybody can still get in line." },
       { t: "Only in Duval", ok: false, why: "County does not invent a different poverty rule." }
     ]
   },
@@ -247,7 +249,7 @@ const QUIZ = [
     q: "About how many PEP students were funded statewide in 2025–26?",
     opts: [
       { t: "A few hundred", ok: false, why: "That would still be a pilot. This is not a pilot." },
-      { t: "Nearly 80,000", ok: true, why: "You are joining a crowd, not starting a club." },
+      { t: "Nearly 80,000", ok: true, why: "You’re joining a crowd, not starting a club." },
       { t: "Two million", ok: false, why: "That would be almost every Florida kid. It is not." }
     ]
   },
@@ -263,16 +265,16 @@ const QUIZ = [
     q: "New PEP applications for 2026–27 close…",
     opts: [
       { t: "November 15", ok: false, why: "That is the private-school / UA new-app date. PEP is earlier." },
-      { t: "April 30", ok: true, why: "This is the date homeschool families miss." },
-      { t: "Whenever the co-op posts it", ok: false, why: "The state does not wait on a Facebook admin." }
+      { t: "April 30", ok: true, why: "This is the date homeschool folks miss every year." },
+      { t: "Whenever the co-op posts it", ok: false, why: "The state ain’t waiting on a Facebook admin." }
     ]
   },
   {
     q: "After you are awarded, the last move is…",
     opts: [
-      { t: "Screenshot it and wait", ok: false, why: "Unaccepted awards leave." },
+      { t: "Screenshot it and wait", ok: false, why: "If you don’t accept, the award leaves." },
       { t: "Accept the scholarship in EMA by the deadline", ok: true, why: "Accept is the click that turns paper into money." },
-      { t: "Have the farm apply for you", ok: false, why: "Parents own the EMA account. Providers cannot file it." }
+      { t: "Have the farm apply for you", ok: false, why: "Parents own the EMA account. The farm can’t file it for you." }
     ]
   }
 ];
@@ -313,24 +315,24 @@ function home() {
   return `
     <p class="hint">Critters on Call · Florida</p>
     <h1>Step Right Up.</h1>
-    <p class="lead">Two little games. First you learn the scholarship well enough to file. Then you clear the list that is already on your phone.</p>
+    <p class="lead">Two little games. First you get the scholarship straight enough to file. Then you knock out the list already on your phone.</p>
     <div class="grid">
       <button class="card-btn game-card" onclick="startStep()">
         <img src="${MARK1}" alt="" />
         <div>
           <b>Step Right Up</b>
-          <span>Seven lessons. Seven questions. Earn the gate-and-wings image.</span>
+          <span>Short lessons, a quick quiz, earn the Filed It badge.</span>
         </div>
       </button>
       <button class="card-btn game-card" onclick="go('watch')">
         <img src="${MARK2}" alt="" />
         <div>
           <b>Your Week</b>
-          <span>Juggling mom energy. Colored balls. Recital, soccer, the mortgage.</span>
+          <span>Juggling it — colored balls. Recital, soccer, the mortgage.</span>
         </div>
       </button>
     </div>
-    <p class="tiny">A confidence tool, not the application and not legal advice. Rules and money live at Step Up. We just make the first door less scary.</p>
+    <p class="tiny">This is a confidence tool — not the real application, not legal advice. Rules and money live at Step Up. We just make the first door less scary.</p>
   `;
 }
 
@@ -340,12 +342,12 @@ function startStep() {
 }
 
 function role() {
-  const presets = ["mom", "dad", "grandma", "auntie", "friends"];
+  const presets = ["mom", "dad", "grandma", "auntie", "friends", "vpk", "ppec"];
   return `
     <img class="mark small" src="${MARK1}" alt="" />
     <p class="hint">Who is playing</p>
     <h2>Who is filing</h2>
-    <p class="lead">Mom first. Or say who you actually are.</p>
+    <p class="lead">Mom first. Or Friends, VPK, PPEC — whoever’s on the laptop.</p>
     <div class="grid">
       ${presets.map((id) => `
         <button class="card-btn" onclick="pickRole('${id}')"><b>${ROLES[id].title}</b></button>
@@ -353,7 +355,7 @@ function role() {
     </div>
     <div class="lesson" style="margin-top:10px">
       <div class="tag">Write it in</div>
-      <p>Nana. Coach. Two friends. The person who actually does the portal.</p>
+      <p>Nana. Coach. Friends. VPK. PPEC. Whoever’s actually doing the portal.</p>
       <input id="writein" maxlength="24" placeholder="That’s me"
         style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:1px solid #c4a35a;font:inherit" />
       <p class="why" id="writeWarn" style="display:none">Try another name.</p>
@@ -484,8 +486,8 @@ function wings() {
       <canvas id="badge" width="280" height="280"></canvas>
       <h2>${passed ? ROLES[state.role].line : "Close. Run it once more."}</h2>
       <p>${passed
-        ? "That image is the wings. It means you can file without guessing."
-        : "You had " + state.score + " right. Five opens the gate."}</p>
+        ? "That’s your Filed It badge. Means you can open the portal without guessing."
+        : "You had " + state.score + " right. Five right and you’re in."}</p>
     </div>
     <div class="check">
       <b>Real level — do this on the official site</b>
@@ -511,7 +513,7 @@ function watchScreen() {
     <img class="mark small" src="${MARK2}" alt="" />
     <p class="hint">Module 2 · Your Week</p>
     <h2>Juggling it.</h2>
-    <p class="lead">Recital. Soccer. The mortgage. Tap the ball before it drops.</p>
+    <p class="lead">Recital. Soccer. Mortgage. Tap the ball before it drops.</p>
     <div class="hud"><span>Held <b id="held">0</b></span><span>Dropped <b id="dropped">0</b>/5</span></div>
     <canvas id="watch" width="400" height="440"></canvas>
     <div class="toast" id="toast">Tap what falls.</div>
